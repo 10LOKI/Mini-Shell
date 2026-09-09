@@ -3,20 +3,20 @@ package ma.youcode.lineperm.model;
 public class User
 {
     private String  login;
-    private String  password;
+    private String  passwordHash;
 
-    public  User(String login,String password)
+    public  User(String login,String passwordHash)
     {
         this.login = login;
-        this.password = password;
+        this.passwordHash = passwordHash;
     }
 
     public String   getLogin()
     {
         return (login);
     }
-    public String   getPassword()
+    public String   getPasswordHash()
     {
-        return password;
+        return (passwordHash);
     }
 }
