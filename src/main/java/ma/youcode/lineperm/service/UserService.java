@@ -55,14 +55,6 @@ public class UserService
     }
     public String signup (String login , String password)
     {
-        if (users.containsKey(login))
-        {
-            return "Ce login existe deja";
-        }
-        if (currentUser != null)
-        {
-            return "deja user connectez";
-        }
         if (login == null || login.trim().isEmpty() || login.contains(" ") || login.contains(":"))
         {
             return "Login invalide.";
@@ -70,6 +62,14 @@ public class UserService
         if (password == null || password.trim().isEmpty())
         {
             return "Invalide password";
+        }
+        if (currentUser != null)
+        {
+            return "deja user connectez";
+        }
+        if (users.containsKey(login))
+        {
+            return "Ce login existe deja";
         }
         String hash = BCrypt.hashpw(password, BCrypt.gensalt());
         User user = new User(login ,hash);
@@ -79,11 +79,46 @@ public class UserService
     }
 
 
-    public void login (String login , String password)
+    public String login (String login , String password)
     {
-        
+        if (currentUser != null)
+        {
+            return "deja user connectez";
+        }
+        if (login == null || login.trim().isEmpty() || login.contains(" ") || login.contains(":"))
+        {
+            return "Login ou password invalide.";
+        }
+        if (password == null || password.trim().isEmpty())
+        {
+            return "Login ou password invalide.";
+        }
+        User user = users.get(login);
+        if (user == null)
+        {
+            return "login ou password incorrect";
+        }
+        boolean motDePasseCorrect = BCrypt.checkpw(password, user.getPasswordHash());
+        if (!motDePasseCorrect)
+        {
+            return "login ou mot de pass incorrect";
+        }
+        currentUser = user;
+        return "Bienvenue " + user.getLogin();
     }
 
+    public String logout ()
+    {
+        if (currentUser == null)
+        {
+            return "no user is connected";
+        }
+        currentUser = null;
+        return "disconnected";
+    }
 
-    public void logout ();
+    public boolean estConnecte()
+    {
+        return currentUser != null;
+    }
 }
