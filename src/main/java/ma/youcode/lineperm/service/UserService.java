@@ -40,17 +40,15 @@ public class UserService
                 if (!ligne.trim().isEmpty())
                 {
                     String[] parts = ligne.split(":", 2);
-                    String login = parts[0];
-                    String hash = parts[1];
-                    User user = new User(login, hash);
-                    users.put(login, user);
+                    User user = new User(parts[0], parts[1]);
+                    users.put(parts[0], user);
                 }
                 i++;
             }
         }
         catch (IOException e)
         {
-            System.err.println("Erreur de chargement : " + e.getMessage());
+            System.err.println("Erreur de chargement");
         }
     }
     public String signup (String login , String password)
