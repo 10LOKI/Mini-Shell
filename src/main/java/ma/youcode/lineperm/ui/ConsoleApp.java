@@ -2,36 +2,107 @@ package ma.youcode.lineperm.ui;
 
 import ma.youcode.lineperm.service.UserService;
 import java.util.Scanner;
-public class	ConsoleApp
+
+public class ConsoleApp
 {
-	private boolean	is_actif;
-	private	String	user_connecte;
+	private boolean is_actif;
+	private String user_connecte;
 	private Scanner scanner = new Scanner(System.in);
+	private UserService userservice = new UserService();
 
-	private	UserService userservice = new UserService();
-	
-
-	public	ConsoleApp()
+	public ConsoleApp()
 	{
 		this.is_actif = false;
 		this.user_connecte = null;
 	}
 
-	public	void	commencer()
+	public void commencer()
 	{
-		System.out.println("************* LinePerm Console *********    *");
+		System.out.println("╔══════════════════════════════════╗");
+		System.out.println("║   LinePerm — by Ayoub Ouharda     ║");
+		System.out.println("╚══════════════════════════════════╝");
 		System.out.println("------------- Start ------------");
+		System.out.println("Commandes : signup  || login  || help  || exit");
+
 		while (!is_actif)
 		{
-			System.out.println("Utilisateur non connecté || 1. signup || 2. Login || 3.help || 4.exit");
-			break;
+			if (user_connecte == null)
+			{
+				System.out.print("linperm> ");
+			}
+			else
+			{
+				System.out.print(user_connecte + "@linperm> ");
+			}
+
+			String ligne = scanner.nextLine();
+			ligne = ligne.trim();
+
+			if (ligne.isEmpty())
+			{
+				continue;
+			}
+
+			String[] mots = ligne.split(" ");
+			String commande = mots[0];
+
+			switch (commande)
+			{
+				case "signup":
+					traiterSignup();
+					break;
+
+				case "login":
+					traiterLogin();
+					break;
+
+				case "logout":
+					traiterLogout();
+					break;
+
+				case "exit":
+					is_actif = true;
+					System.out.println("Au revoir.");
+					break;
+
+				default:
+					System.out.println("Commande inconnue.");
+					break;
+			}
 		}
 	}
 
-	public void		lireligne()
-	{}
-	public void		output()
-	{}
+	private void traiterSignup()
+	{
+		System.out.print("Login : ");
+		String login = scanner.nextLine().trim();
+		System.out.print("Mot de passe : ");
+		String password = scanner.nextLine().trim();
 
+		String resultat = userservice.signup(login, password);
+		System.out.println(resultat);
+	}
 
+	private void traiterLogin()
+	{
+		System.out.print("Login : ");
+		String login = scanner.nextLine().trim();
+		System.out.print("Mot de passe : ");
+		String password = scanner.nextLine().trim();
+
+		String resultat = userservice.login(login, password);
+		System.out.println(resultat);
+
+		if (userservice.estConnecte())
+		{
+			user_connecte = login;
+		}
+	}
+	
+	private void traiterLogout()
+	{
+		String resultat = userservice.logout();
+		System.out.println(resultat);
+		user_connecte = null;
+	}
 }
