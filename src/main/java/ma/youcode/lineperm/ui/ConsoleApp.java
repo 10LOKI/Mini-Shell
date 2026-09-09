@@ -105,4 +105,5 @@ public class ConsoleApp
 		System.out.println(resultat);
 		user_connecte = null;
 	}
+	// New branch auth
 }
