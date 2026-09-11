@@ -19,6 +19,10 @@ public class UserService
         this.users = new HashMap<>();
         this.currentUser = null;
     }
+    public User   getCurrentUser()
+    {
+        return (currentUser);
+    }
     public void charger(String filePath)
     {
         Path path = Path.of(filePath);

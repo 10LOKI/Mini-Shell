@@ -10,7 +10,7 @@ public class    ControleAcces
             if (droit == 'r')
             return (fichier.isRead_prop());
             if (droit == 'w')
-            return (fichier.iswrite_prop());
+            return (fichier.isWrite_prop());
             if (droit == 'd')
             return (fichier.isDelete_prop());
         }

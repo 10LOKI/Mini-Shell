@@ -1,6 +1,7 @@
 package ma.youcode.lineperm.ui;
 
 import ma.youcode.lineperm.service.UserService;
+import ma.youcode.lineperm.service.FichierService;
 import java.util.Scanner;
 
 public class ConsoleApp
@@ -9,6 +10,7 @@ public class ConsoleApp
 	private String user_connecte;
 	private Scanner scanner = new Scanner(System.in);
 	private UserService userservice = new UserService();
+	private FichierService fichierservice = new FichierService();
 
 	public ConsoleApp()
 	{
@@ -59,7 +61,12 @@ public class ConsoleApp
 				case "logout":
 					traiterLogout();
 					break;
-
+				case "ls":
+					fichierservice.lister();
+					break;
+				case "cat":
+					fichierservice.lire();
+					break;
 				case "exit":
 					is_actif = true;
 					System.out.println("Au revoir.");
@@ -106,4 +113,11 @@ public class ConsoleApp
 		user_connecte = null;
 	}
 	// New branch auth
+	// private void	traiterCat()
+	// {
+	// 	System.out.println("Nom du fichier :");
+	// 	String nom = scanner.nextLine().trim();
+	// 	String contenu = fichierservice.lire(nom,userservice.getCurrentUser());
+	// 	if (contenu != null) System.out.println(contenu);
+	// }
 }
