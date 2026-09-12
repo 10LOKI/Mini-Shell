@@ -14,10 +14,13 @@ public class UserService
     private Map<String,User> users;
     private User currentUser;
     
+    private static final String USERS_FILE = "data/users.db";
+
     public UserService()
     {
         this.users = new HashMap<>();
         this.currentUser = null;
+        charger(USERS_FILE);
     }
     public User   getCurrentUser()
     {
@@ -74,9 +77,9 @@ public class UserService
             return "Ce login existe deja";
         }
         String hash = BCrypt.hashpw(password, BCrypt.gensalt());
-        User user = new User(login ,hash);
-        users.put(login , user);
-
+        User user = new User(login, hash);
+        users.put(login, user);
+        sauvegarder();
         return "Compte cree par succes";
     }
 
@@ -122,5 +125,21 @@ public class UserService
     public boolean estConnecte()
     {
         return currentUser != null;
+    }
+
+    public void sauvegarder()
+    {
+        try
+        {
+            Files.createDirectories(Path.of("data"));
+            StringBuilder sb = new StringBuilder();
+            for (User u : users.values())
+                sb.append(u.getLogin()).append(":").append(u.getPasswordHash()).append("\n");
+            Files.writeString(Path.of(USERS_FILE), sb.toString());
+        }
+        catch (IOException e)
+        {
+            System.err.println("Erreur de sauvegarde users: " + e.getMessage());
+        }
     }
 }
