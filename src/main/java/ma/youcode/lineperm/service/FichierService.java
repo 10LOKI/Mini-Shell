@@ -22,7 +22,7 @@ public class    FichierService
         int i = 0;
         while (i < fichiers.size())
         {
-            if (fichiers.get(i).get_nom().equals(nom))
+            if (fichiers.get(i).getNom().equals(nom))
                 return (true);
             i++;
         }
@@ -66,59 +66,15 @@ public class    FichierService
             Fichier fichier = fichiers.get(i);
             String droits = "";
 
-            if (fichier.isRead_prop())
-            {
-                droits += "r";
-            }
-            else
-            {
-                droits += "-";
-            }
-            if (fichier.isWrite_prop())
-            {
-                droits += "w";
-            }
-            else
-            {
-                droits += "-";
-            }
-            if (fichier.isDelete_prop())
-            {
-                droits += "d";
-            }
-            else
-            {
-                droits += "-";
-            }
-
+            droits += fichier.isReadProp()   ? "r" : "-";
+            droits += fichier.isWriteProp()  ? "w" : "-";
+            droits += fichier.isDeleteProp() ? "d" : "-";
             droits += "|";
+            droits += fichier.isReadOther()   ? "r" : "-";
+            droits += fichier.isWriteOther()  ? "w" : "-";
+            droits += fichier.isDeleteOther() ? "d" : "-";
 
-            if (fichier.isRead_other())
-            {
-                droits += "r";
-            }
-            else
-            {
-                droits += "-";
-            }
-            if (fichier.isWrite_other())
-            {
-                droits += "w";
-            }
-            else
-            {
-                droits += "-";
-            }
-            if (fichier.isDelete_other())
-            {
-                droits += "d";
-            }
-            else
-            {
-                droits += "-";
-            }
-
-            System.out.println(droits + fichier.get_proprietaire() + "  " + fichier.get_nom());
+            System.out.println(droits + fichier.getProprietaire() + "  " + fichier.getNom());
 
             i++;
         }
@@ -146,6 +102,7 @@ public class    FichierService
         return (fichier);
     }
 
+
     public String lire()
     {
         return "";
@@ -157,9 +114,9 @@ public class    FichierService
         while (i < fichiers.size())
         {
             Fichier fichier = fichiers.get(i);
-            if (fichier.get_nom().equals(nom))
+            if (fichier.getNom().equals(nom))
             {
-                if (!ControleAcces.estAutorise(currentUser.getLogin(),fichier , 'r'))
+                if (!ControleAcces.estAutorise(currentUser.getLogin(), fichier, 'r'))
                 {
                     System.out.println("permission denied");
                     return null;
@@ -186,9 +143,9 @@ public class    FichierService
         while (i < fichiers.size())
         {
             Fichier fichier = fichiers.get(i);
-            if(fichier.get_nom().equals(nom))
+            if (fichier.getNom().equals(nom))
             {
-                if (!ControleAcces.estAutorise(currentUser.getLogin(),fichier, 'w'))
+                if (!ControleAcces.estAutorise(currentUser.getLogin(), fichier, 'w'))
                 {
                     System.out.println("permission denied");
                     return (false);
@@ -217,60 +174,30 @@ public class    FichierService
         while (i < fichiers.size())
         {
             Fichier fichier = fichiers.get(i);
-            if (fichier.get_nom().equals(nom))
+            if (fichier.getNom().equals(nom))
             {
-                if (!fichier.get_proprietaire().equals(currentUser.getLogin()))
+                if (!fichier.getProprietaire().equals(currentUser.getLogin()))
                 {
                     System.out.println("permission denied");
                     return (false);
                 }
                 if (droit == 'r')
                 {
-                    if (cible.equals("prop"))
-                    {
-                        fichier.setRead_prop(valeur);
-                    }
-                    else if (cible.equals("other"))
-                    {
-                        fichier.setRead_other(valeur);
-                    }
-                    else
-                    {
-                        System.out.println("cible invalid");
-                        return (false);
-                    }
+                    if (cible.equals("prop"))        fichier.setReadProp(valeur);
+                    else if (cible.equals("other"))  fichier.setReadOther(valeur);
+                    else { System.out.println("cible invalid"); return (false); }
                 }
                 else if (droit == 'w')
                 {
-                    if (cible.equals("prop"))
-                    {
-                        fichier.setWrite_prop(valeur);
-                    }
-                    else if (cible.equals("other"))
-                    {
-                        fichier.setWrite_other(valeur);
-                    }
-                    else
-                    {
-                        System.out.println("cible invalid");
-                        return (false);
-                    }
+                    if (cible.equals("prop"))        fichier.setWriteProp(valeur);
+                    else if (cible.equals("other"))  fichier.setWriteOther(valeur);
+                    else { System.out.println("cible invalid"); return (false); }
                 }
                 else if (droit == 'd')
                 {
-                    if (cible.equals("prop"))
-                    {
-                        fichier.setDelete_prop(valeur);
-                    }
-                    else if (cible.equals("other"))
-                    {
-                        fichier.setDelete_other(valeur);
-                    }
-                    else
-                    {
-                        System.out.println("cible invalid");
-                        return (false);
-                    }
+                    if (cible.equals("prop"))        fichier.setDeleteProp(valeur);
+                    else if (cible.equals("other"))  fichier.setDeleteOther(valeur);
+                    else { System.out.println("cible invalid"); return (false); }
                 }
                 else
                 {
@@ -291,7 +218,7 @@ public class    FichierService
         while (i < fichiers.size())
         {
             Fichier fichier = fichiers.get(i);
-            if (fichier.get_nom().equals(nom))
+            if (fichier.getNom().equals(nom))
             {
                 if (!ControleAcces.estAutorise(currentUser.getLogin(), fichier, 'd'))
                 {
@@ -326,14 +253,14 @@ public class    FichierService
             while (i < fichiers.size())
             {
                 Fichier f = fichiers.get(i);
-                sb.append(f.get_nom()).append(":")
-                .append(f.get_proprietaire()).append(":")
-                .append(f.isRead_prop()).append(":")
-                .append(f.isWrite_prop()).append(":")
-                .append(f.isDelete_prop()).append(":")
-                .append(f.isRead_other()).append(":")
-                .append(f.isWrite_other()).append(":")
-                .append(f.isDelete_other()).append("\n");
+                sb.append(f.getNom()).append(":")
+                .append(f.getProprietaire()).append(":")
+                .append(f.isReadProp()).append(":")
+                .append(f.isWriteProp()).append(":")
+                .append(f.isDeleteProp()).append(":")
+                .append(f.isReadOther()).append(":")
+                .append(f.isWriteOther()).append(":")
+                .append(f.isDeleteOther()).append("\n");
                 i++;
             }
             Files.writeString(chemin, sb.toString());

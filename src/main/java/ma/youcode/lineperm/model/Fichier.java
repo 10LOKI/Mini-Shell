@@ -1,95 +1,95 @@
 package ma.youcode.lineperm.model;
 
-public class    Fichier
+public class Fichier
 {
     private String  nom;
     private String  proprietaire;
-    private boolean read_prop;
-    private boolean write_prop;
-    private boolean delete_prop;
-    private boolean read_other;
-    private boolean write_other;
-    private boolean delete_other;
+    private boolean readProp;
+    private boolean writeProp;
+    private boolean deleteProp;
+    private boolean readOther;
+    private boolean writeOther;
+    private boolean deleteOther;
 
-    public  Fichier(String nom , String proprietaire)
+    public Fichier(String nom, String proprietaire)
     {
         this(nom, proprietaire, true, true, true, false, false, false);
-
     }
-    public  Fichier(String nom , String proprietaire , boolean read_prop , boolean write_prop , boolean delete_prop , boolean read_other , boolean write_other , boolean delete_other)
+
+    public Fichier(String nom, String proprietaire, boolean readProp, boolean writeProp, boolean deleteProp, boolean readOther, boolean writeOther, boolean deleteOther)
     {
         this.nom = nom;
         this.proprietaire = proprietaire;
-        this.read_prop = read_prop;
-        this.write_prop = write_prop;
-        this.delete_prop = delete_prop;
-        this.read_other = read_other;
-        this.write_other = write_other;
-        this.delete_other = delete_other;
+        this.readProp = readProp;
+        this.writeProp = writeProp;
+        this.deleteProp = deleteProp;
+        this.readOther = readOther;
+        this.writeOther = writeOther;
+        this.deleteOther = deleteOther;
     }
 
-    public String   get_nom()
+    public String getNom()
     {
         return (nom);
     }
-    public  void    set_nom(String nom)
+    public void setNom(String nom)
     {
         this.nom = nom;
     }
-    public String   get_proprietaire()
+    public String getProprietaire()
     {
         return (proprietaire);
     }
-    public void set_proprietaire(String proprietaire)
+    public void setProprietaire(String proprietaire)
     {
         this.proprietaire = proprietaire;
     }
-    public boolean  isRead_prop()
+    public boolean isReadProp()
     {
-        return (read_prop);
+        return (readProp);
     }
-    public void setRead_prop(boolean read_prop)
+    public void setReadProp(boolean readProp)
     {
-        this.read_prop = read_prop;
+        this.readProp = readProp;
     }
-    public boolean  isWrite_prop()
+    public boolean isWriteProp()
     {
-        return (write_prop);
+        return (writeProp);
     }
-    public void setWrite_prop(boolean write_prop)
+    public void setWriteProp(boolean writeProp)
     {
-        this.write_prop = write_prop;
+        this.writeProp = writeProp;
     }
-    public boolean  isDelete_prop()
+    public boolean isDeleteProp()
     {
-        return (delete_prop);
+        return (deleteProp);
     }
-    public void setDelete_prop(boolean delete_prop)
+    public void setDeleteProp(boolean deleteProp)
     {
-        this.delete_prop = delete_prop;
+        this.deleteProp = deleteProp;
     }
-        public boolean  isRead_other()
+    public boolean isReadOther()
     {
-        return (read_other);
+        return (readOther);
     }
-    public void setRead_other(boolean read_other)
+    public void setReadOther(boolean readOther)
     {
-        this.read_other = read_other;
+        this.readOther = readOther;
     }
-    public boolean  isWrite_other()
+    public boolean isWriteOther()
     {
-        return (write_other);
+        return (writeOther);
     }
-    public void setWrite_other(boolean write_other)
+    public void setWriteOther(boolean writeOther)
     {
-        this.write_other = write_other;
+        this.writeOther = writeOther;
     }
-    public boolean  isDelete_other()
+    public boolean isDeleteOther()
     {
-        return (delete_other);
+        return (deleteOther);
     }
-    public void setDelete_other(boolean delete_other)
+    public void setDeleteOther(boolean deleteOther)
     {
-        this.delete_other = delete_other;
+        this.deleteOther = deleteOther;
     }
 }
