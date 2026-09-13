@@ -7,7 +7,6 @@ import java.nio.file.Path;
 import java.io.IOException;
 import ma.youcode.lineperm.model.Fichier;
 import ma.youcode.lineperm.model.User;
-import ma.youcode.lineperm.access.ControleAcces;
 
 public class    FichierService
 {
@@ -116,7 +115,7 @@ public class    FichierService
             Fichier fichier = fichiers.get(i);
             if (fichier.getNom().equals(nom))
             {
-                if (!ControleAcces.estAutorise(currentUser.getLogin(), fichier, 'r'))
+                if (!fichier.estAutorisee(currentUser.getLogin(), 'r'))
                 {
                     System.out.println("permission denied");
                     return null;
@@ -145,7 +144,7 @@ public class    FichierService
             Fichier fichier = fichiers.get(i);
             if (fichier.getNom().equals(nom))
             {
-                if (!ControleAcces.estAutorise(currentUser.getLogin(), fichier, 'w'))
+                if (!fichier.estAutorisee(currentUser.getLogin(), 'w'))
                 {
                     System.out.println("permission denied");
                     return (false);
@@ -220,7 +219,7 @@ public class    FichierService
             Fichier fichier = fichiers.get(i);
             if (fichier.getNom().equals(nom))
             {
-                if (!ControleAcces.estAutorise(currentUser.getLogin(), fichier, 'd'))
+                if (!fichier.estAutorisee(currentUser.getLogin(), 'd'))
                 {
                     System.out.println("permission denied");
                     return (false);
