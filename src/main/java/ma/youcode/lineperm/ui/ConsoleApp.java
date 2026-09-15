@@ -189,7 +189,7 @@ private void traiterTouch(String[] mots)
 		}
 		char droit = mots[3].charAt(0);
 		boolean valeur = Boolean.parseBoolean(mots[4]);
-		fichierservice.changer_perm(mots[1], mots[2], droit, valeur, userservice.getCurrentUser());
+		fichierservice.changerPerm(mots[1], mots[2], droit, valeur, userservice.getCurrentUser());
 		fichierservice.sauvegarder();
 	}
 

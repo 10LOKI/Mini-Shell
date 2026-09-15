@@ -7,15 +7,18 @@ import java.nio.file.Path;
 import java.io.IOException;
 import ma.youcode.lineperm.model.Fichier;
 import ma.youcode.lineperm.model.User;
+import ma.youcode.lineperm.access.ControleAcces;
 
-public class    FichierService
+public class FichierService
 {
-    private List <Fichier> fichiers;
-    public  FichierService()
+    private List<Fichier> fichiers;
+
+    public FichierService()
     {
         this.fichiers = new ArrayList<>();
         charger();
     }
+
     private boolean fichierExiste(String nom)
     {
         int i = 0;
@@ -40,6 +43,7 @@ public class    FichierService
         }
         return (true);
     }
+
     private boolean creerFichierSurDisque(String nom)
     {
         try
@@ -55,26 +59,22 @@ public class    FichierService
             return (false);
         }
     }
+
     public void lister()
     {
-        int i;
-
-        i = 0;
+        int i = 0;
         while (i < fichiers.size())
         {
             Fichier fichier = fichiers.get(i);
             String droits = "";
-
-            droits += fichier.isReadProp()   ? "r" : "-";
-            droits += fichier.isWriteProp()  ? "w" : "-";
-            droits += fichier.isDeleteProp() ? "d" : "-";
+            droits += fichier.isReadProp()    ? "r" : "-";
+            droits += fichier.isWriteProp()   ? "w" : "-";
+            droits += fichier.isDeleteProp()  ? "d" : "-";
             droits += "|";
             droits += fichier.isReadOther()   ? "r" : "-";
             droits += fichier.isWriteOther()  ? "w" : "-";
             droits += fichier.isDeleteOther() ? "d" : "-";
-
-            System.out.println(droits + fichier.getProprietaire() + "  " + fichier.getNom());
-
+            System.out.println(droits + " " + fichier.getProprietaire() + "  " + fichier.getNom());
             i++;
         }
     }
@@ -101,50 +101,45 @@ public class    FichierService
         return (fichier);
     }
 
-
-    public String lire()
+    public String lire(String nom, User currentUser)
     {
-        return "";
-    }
-    public String   lire(String nom , User currentUser)
-    {
-        int i;
-        i = 0;
+        int i = 0;
         while (i < fichiers.size())
         {
             Fichier fichier = fichiers.get(i);
             if (fichier.getNom().equals(nom))
             {
-                if (!fichier.estAutorisee(currentUser.getLogin(), 'r'))
+                if (!ControleAcces.estAutorise(currentUser.getLogin(), fichier, 'r'))
                 {
                     System.out.println("permission denied");
-                    return null;
+                    return (null);
                 }
                 try
                 {
                     Path chemin = Path.of("data").resolve(nom);
                     return Files.readString(chemin);
                 }
-                catch(IOException e)
+                catch (IOException e)
                 {
-                    System.err.println("Cannot read the file" + e);
-                    return null;
+                    System.err.println("Cannot read the file: " + e.getMessage());
+                    return (null);
                 }
             }
             i++;
         }
-        return null;
+        System.out.println("Fichier introuvable");
+        return (null);
     }
+
     public boolean ecrire(String nom, String contenu, User currentUser)
     {
-        int i;
-        i = 0;
+        int i = 0;
         while (i < fichiers.size())
         {
             Fichier fichier = fichiers.get(i);
             if (fichier.getNom().equals(nom))
             {
-                if (!fichier.estAutorisee(currentUser.getLogin(), 'w'))
+                if (!ControleAcces.estAutorise(currentUser.getLogin(), fichier, 'w'))
                 {
                     System.out.println("permission denied");
                     return (false);
@@ -157,53 +152,9 @@ public class    FichierService
                 }
                 catch (IOException e)
                 {
-                    System.err.println("Cannot write to the file " + e);
+                    System.err.println("Cannot write to the file: " + e.getMessage());
                     return (false);
                 }
-            }
-            i++;
-        }
-        System.out.println("Fichier introuvable");
-        return (false);
-    }
-    public boolean changer_perm(String nom, String cible, char droit, boolean valeur, User currentUser)
-    {
-        int i;
-        i = 0;
-        while (i < fichiers.size())
-        {
-            Fichier fichier = fichiers.get(i);
-            if (fichier.getNom().equals(nom))
-            {
-                if (!fichier.getProprietaire().equals(currentUser.getLogin()))
-                {
-                    System.out.println("permission denied");
-                    return (false);
-                }
-                if (droit == 'r')
-                {
-                    if (cible.equals("prop"))        fichier.setReadProp(valeur);
-                    else if (cible.equals("other"))  fichier.setReadOther(valeur);
-                    else { System.out.println("cible invalid"); return (false); }
-                }
-                else if (droit == 'w')
-                {
-                    if (cible.equals("prop"))        fichier.setWriteProp(valeur);
-                    else if (cible.equals("other"))  fichier.setWriteOther(valeur);
-                    else { System.out.println("cible invalid"); return (false); }
-                }
-                else if (droit == 'd')
-                {
-                    if (cible.equals("prop"))        fichier.setDeleteProp(valeur);
-                    else if (cible.equals("other"))  fichier.setDeleteOther(valeur);
-                    else { System.out.println("cible invalid"); return (false); }
-                }
-                else
-                {
-                    System.out.println("droit invalid");
-                    return (false);
-                }
-                return (true);
             }
             i++;
         }
@@ -219,7 +170,7 @@ public class    FichierService
             Fichier fichier = fichiers.get(i);
             if (fichier.getNom().equals(nom))
             {
-                if (!fichier.estAutorisee(currentUser.getLogin(), 'd'))
+                if (!ControleAcces.estAutorise(currentUser.getLogin(), fichier, 'd'))
                 {
                     System.out.println("permission denied");
                     return (false);
@@ -242,10 +193,55 @@ public class    FichierService
         return (false);
     }
 
+    public boolean changerPerm(String nom, String cible, char droit, boolean valeur, User currentUser)
+    {
+        int i = 0;
+        while (i < fichiers.size())
+        {
+            Fichier fichier = fichiers.get(i);
+            if (fichier.getNom().equals(nom))
+            {
+                if (!fichier.getProprietaire().equals(currentUser.getLogin()))
+                {
+                    System.out.println("permission denied");
+                    return (false);
+                }
+                if (droit == 'r')
+                {
+                    if (cible.equals("prop"))       fichier.setReadProp(valeur);
+                    else if (cible.equals("other")) fichier.setReadOther(valeur);
+                    else { System.out.println("cible invalid"); return (false); }
+                }
+                else if (droit == 'w')
+                {
+                    if (cible.equals("prop"))       fichier.setWriteProp(valeur);
+                    else if (cible.equals("other")) fichier.setWriteOther(valeur);
+                    else { System.out.println("cible invalid"); return (false); }
+                }
+                else if (droit == 'd')
+                {
+                    if (cible.equals("prop"))       fichier.setDeleteProp(valeur);
+                    else if (cible.equals("other")) fichier.setDeleteOther(valeur);
+                    else { System.out.println("cible invalid"); return (false); }
+                }
+                else
+                {
+                    System.out.println("droit invalid");
+                    return (false);
+                }
+                return (true);
+            }
+            i++;
+        }
+        System.out.println("Fichier introuvable");
+        return (false);
+    }
+
     public void sauvegarder()
     {
         try
         {
+            Files.createDirectories(Path.of("data"));
             Path chemin = Path.of("data/fichiers.db");
             StringBuilder sb = new StringBuilder();
             int i = 0;
@@ -253,13 +249,13 @@ public class    FichierService
             {
                 Fichier f = fichiers.get(i);
                 sb.append(f.getNom()).append(":")
-                .append(f.getProprietaire()).append(":")
-                .append(f.isReadProp()).append(":")
-                .append(f.isWriteProp()).append(":")
-                .append(f.isDeleteProp()).append(":")
-                .append(f.isReadOther()).append(":")
-                .append(f.isWriteOther()).append(":")
-                .append(f.isDeleteOther()).append("\n");
+                  .append(f.getProprietaire()).append(":")
+                  .append(f.isReadProp()).append(":")
+                  .append(f.isWriteProp()).append(":")
+                  .append(f.isDeleteProp()).append(":")
+                  .append(f.isReadOther()).append(":")
+                  .append(f.isWriteOther()).append(":")
+                  .append(f.isDeleteOther()).append("\n");
                 i++;
             }
             Files.writeString(chemin, sb.toString());
