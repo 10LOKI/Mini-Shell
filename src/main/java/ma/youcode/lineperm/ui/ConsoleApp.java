@@ -189,21 +189,29 @@ private void traiterTouch(String[] mots)
 		}
 		char droit = mots[3].charAt(0);
 		boolean valeur = Boolean.parseBoolean(mots[4]);
-		fichierservice.changer_perm(mots[1], mots[2], droit, valeur, userservice.getCurrentUser());
+		fichierservice.changerPerm(mots[1], mots[2], droit, valeur, userservice.getCurrentUser());
 		fichierservice.sauvegarder();
 	}
 
 	private void traiterHelp()
 	{
-		System.out.println("signup            — créer un compte");
-		System.out.println("login             — se connecter");
-		System.out.println("logout            — se déconnecter");
+		if (user.estConnecte())
+		{
+					System.out.println("logout            — se déconnecter");
 		System.out.println("ls                — lister les fichiers");
 		System.out.println("touch <fichier>   — créer un fichier");
 		System.out.println("cat <fichier>     — lire un fichier");
 		System.out.println("write <fichier> <contenu> — écrire dans un fichier");
 		System.out.println("rm <fichier>      — supprimer un fichier");
 		System.out.println("chmod <fichier> <prop|other> <r|w|d> <true|false> — changer les droits");
+		}
+		else
+		{
+			System.out.println("signup            — créer un compte");
+		System.out.println("login             — se connecter");
+		}
+		
+
 		System.out.println("exit              — quitter");
 	}
 }

@@ -2,21 +2,28 @@ package ma.youcode.lineperm.model;
 
 public class User
 {
-    private String  login;
-    private String  passwordHash;
+    private String login;
+    private String passwordHash;
 
-    public  User(String login,String passwordHash)
+    public User(String login, String passwordHash)
     {
         this.login = login;
         this.passwordHash = passwordHash;
     }
 
-    public String   getLogin()
+    public String getLogin()
     {
         return (login);
     }
-    public String   getPasswordHash()
+
+    public String getPasswordHash()
     {
         return (passwordHash);
+    }
+
+    @Override
+    public String toString()
+    {
+        return "User{login = '" + login + "'}";
     }
 }
