@@ -23,9 +23,9 @@ public class ConsoleApp
 		System.out.println("╔══════════════════════════════════╗");
 		System.out.println("║   LinePerm — by Ayoub Ouharda     ║");
 		System.out.println("╚══════════════════════════════════╝");
-		System.out.println("Commandes : signup  || login  || logout || ls || touch || cat || write || rm || chmod || help  || exit");
+		System.out.println("Commandes : signup  || login  || logout || ls || touch || cat || write || rm || chmod || stats || help  || exit");
 
-while (!is_actif)
+	while (!is_actif)
 		{
 			if (user_connecte == null)
 				System.out.print("linperm> ");
@@ -68,6 +68,9 @@ while (!is_actif)
 					break;
 				case "chmod":
 					traiterChmod(mots);
+					break;
+				case "stats":
+					// hna gha ndiro lmethode traiterStats();
 					break;
 				case "help":
 					traiterHelp();
@@ -195,23 +198,29 @@ private void traiterTouch(String[] mots)
 
 	private void traiterHelp()
 	{
-		if (user.estConnecte())
-		{
-					System.out.println("logout            — se déconnecter");
+		System.out.println("signup            — créer un compte");
+		System.out.println("login             — se connecter");
+		System.out.println("logout            — se déconnecter");
 		System.out.println("ls                — lister les fichiers");
 		System.out.println("touch <fichier>   — créer un fichier");
 		System.out.println("cat <fichier>     — lire un fichier");
 		System.out.println("write <fichier> <contenu> — écrire dans un fichier");
 		System.out.println("rm <fichier>      — supprimer un fichier");
 		System.out.println("chmod <fichier> <prop|other> <r|w|d> <true|false> — changer les droits");
-		}
-		else
-		{
-			System.out.println("signup            — créer un compte");
-		System.out.println("login             — se connecter");
-		}
-		
-
 		System.out.println("exit              — quitter");
 	}
+	private void	afficherStatsMenu()
+	{
+		System.out.println("=== LogAnalyzer ===");
+        System.out.println("1) Nombre total d'actions");
+        System.out.println("2) Nombre d'accès refusés");
+        System.out.println("3) Utilisateurs distincts");
+        System.out.println("4) Actions par utilisateur");
+        System.out.println("5) Top 3 des fichiers consultés");
+        System.out.println("6) Accès refusés d'un utilisateur");
+        System.out.println("7) Utilisateur le plus actif");
+        System.out.println("8) Répartition des actions par type");
+        System.out.println("0) Quitter");
+	}
+
 }
