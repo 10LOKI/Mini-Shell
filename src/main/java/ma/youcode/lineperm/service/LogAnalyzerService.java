@@ -51,8 +51,9 @@ public class        LogAnalyzerService
     }
     public List<String>         utilisateurDistinct()
     {
-
+        return (logs.stream().map(AccesLog::getUtilisateur).distinct().collect(Collectors.toList()));
     }
+    
     public Map<String, Long>    utilisateurAction()
     {
 
