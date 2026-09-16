@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 public class        LogAnalyzerService
 {
-    private list<AccesLog>  logs;
+    private List<AccesLog>  logs;
 
     public LogAnalyzerService(String cheminFichier)
     {
@@ -17,7 +17,28 @@ public class        LogAnalyzerService
         chargerLogs(cheminFichier);
     }
 
-    
+    private void    chargerLogs(String cheminFichier)
+    {
+        try
+        {
+            List<String> lignes = Files.readAllLines(Path.of(cheminFichier));
+            int i;
+            i = 0;
+            while(i < lignes.size())
+            {
+                String[] champs = lignes.get(i).split(";");
+                if (champs.length == 6)
+                {
+                    logs.add(new AccesLog(champs[0], champs[1], champs[2], champs[3], champs[4], champs[5]));
+                }
+                i ++;
+            }
+        }
+        catch (IOException e)
+        {
+            System.out.printl("Impossible de charger le fichier de logs :" + e.getMessage());
+        }
+    }
 
     public long                 nbrActions()
     {
