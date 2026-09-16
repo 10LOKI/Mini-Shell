@@ -47,7 +47,7 @@ public class        LogAnalyzerService
     }
     public long                 nbrRefus()
     {
-
+        return (logs.stream().filter(l -> l.getResultat().equals("REFUSE")).count());
     }
     public List<String>         utilisateurDistinct()
     {
