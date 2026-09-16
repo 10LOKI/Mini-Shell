@@ -36,13 +36,14 @@ public class        LogAnalyzerService
         }
         catch (IOException e)
         {
-            System.out.printl("Impossible de charger le fichier de logs :" + e.getMessage());
+            System.out.println("Impossible de charger le fichier de logs :" + e.getMessage());
         }
     }
 
     public long                 nbrActions()
     {
-
+        return (logs.stream().count());
+        // wla ndir "return logs.size();"
     }
     public long                 nbrRefus()
     {
