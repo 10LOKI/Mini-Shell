@@ -60,7 +60,7 @@ public class        LogAnalyzerService
     }
     public List<Map.Entry<String, Long>>    topFichiers()
     {
-
+        return (logs.stream().collect(Collectors.groupBy(AccesLog::getFichier, Collectors.counting())).entrySet().stream().sorted(Map.Entry.<String, Long>).comparingByValue().reversed().limit(3).)
     }
     public List<AccesLog>       accesRefus()
     {
