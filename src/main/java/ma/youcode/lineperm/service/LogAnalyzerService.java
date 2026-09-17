@@ -64,7 +64,7 @@ public class        LogAnalyzerService
     }
     public List<AccesLog>       accesRefus()
     {
-
+        return (logs.stream().filter(l -> l.getUtilisateur().equals(utilisateur) && l.getResultat().equals("REFUSE")).collect(Collectors.toList()));
     }
     public Optional<Map.Entry<String, Long>>    plusActif()
     {
