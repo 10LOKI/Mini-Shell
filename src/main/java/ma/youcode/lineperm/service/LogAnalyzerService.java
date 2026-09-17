@@ -56,7 +56,7 @@ public class        LogAnalyzerService
     
     public Map<String, Long>    utilisateurAction()
     {
-        return (logs.stream().map(AccesLog::getUtilisateur).distinct().collect(Collectors.toList()));
+        return (logs.stream().collect(Collectors.groupBy(AccesLog::getUtilisateur,Collectors.counting())));
     }
     public List<Map.Entry<String, Long>>    topFichiers()
     {
