@@ -68,10 +68,10 @@ public class        LogAnalyzerService
     }
     public Optional<Map.Entry<String, Long>>    plusActif()
     {
-
+        return (logs.stream().collect(Collectors.groupingBy(AccesLog::getUtilisateur , Collectors.counting())).entrySet().stream().max(Map.Entry.comparingByValue()));
     }
-    public Map<String, Long>    actionsType()
-    {
+    // public Map<String, Long>    actionsType()
+    // {
 
-    }
+    // }
 }
