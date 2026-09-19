@@ -1,11 +1,11 @@
 package ma.youcode.lineperm.service;
 
-import ma.youcode.lineperm.model.AccesLog;
-import java.util.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.*;
 import java.util.stream.Collectors;
+import ma.youcode.lineperm.model.AccesLog;
 
 public class LogAnalyzerService
 {
