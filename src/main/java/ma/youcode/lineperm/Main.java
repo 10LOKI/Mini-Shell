@@ -10,7 +10,7 @@ public class Main
 
         // System.out.println("Total actions: " + analyzer.nbrActions());
         // System.out.println("Total de refus : " + analyzer.nbrRefus());
-        System.out.println("utilisateur distincts : " + analyzer.utilisateurDistinct());
-
+        // System.out.println("utilisateur distincts : " + analyzer.utilisateurDistinct());
+        System.out.println("Total d'actions : " + analyzer.utilisateurAction());
     }
 }
