@@ -8,7 +8,6 @@ public class Main
     {
         LogAnalyzerService analyzer = new LogAnalyzerService("src/main/resources/acces.log");
 
-        System.out.println("Total actions: " + analyzer.nbrActions());
-        System.out.println("Loki man");
+        // System.out.println("Total actions: " + analyzer.nbrActions());
     }
 }
