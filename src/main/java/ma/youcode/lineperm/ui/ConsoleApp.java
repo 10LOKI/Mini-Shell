@@ -2,6 +2,10 @@ package ma.youcode.lineperm.ui;
 
 import ma.youcode.lineperm.service.UserService;
 import ma.youcode.lineperm.service.FichierService;
+import ma.youcode.lineperm.service.LogAnalyzerService;
+import ma.youcode.lineperm.model.AccesLog;
+import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 public class ConsoleApp
@@ -23,9 +27,9 @@ public class ConsoleApp
 		System.out.println("╔══════════════════════════════════╗");
 		System.out.println("║   LinePerm — by Ayoub Ouharda     ║");
 		System.out.println("╚══════════════════════════════════╝");
-		System.out.println("Commandes : signup  || login  || logout || ls || touch || cat || write || rm || chmod || help  || exit");
+		System.out.println("Commandes : signup  || login  || logout || ls || touch || cat || write || rm || chmod || stats || help  || exit");
 
-while (!is_actif)
+	while (!is_actif)
 		{
 			if (user_connecte == null)
 				System.out.print("linperm> ");
@@ -68,6 +72,9 @@ while (!is_actif)
 					break;
 				case "chmod":
 					traiterChmod(mots);
+					break;
+				case "stats":
+					traiterStats();
 					break;
 				case "help":
 					traiterHelp();
@@ -195,23 +202,81 @@ private void traiterTouch(String[] mots)
 
 	private void traiterHelp()
 	{
-		if (user.estConnecte())
-		{
-					System.out.println("logout            — se déconnecter");
+		System.out.println("signup            — créer un compte");
+		System.out.println("login             — se connecter");
+		System.out.println("logout            — se déconnecter");
 		System.out.println("ls                — lister les fichiers");
 		System.out.println("touch <fichier>   — créer un fichier");
 		System.out.println("cat <fichier>     — lire un fichier");
 		System.out.println("write <fichier> <contenu> — écrire dans un fichier");
 		System.out.println("rm <fichier>      — supprimer un fichier");
 		System.out.println("chmod <fichier> <prop|other> <r|w|d> <true|false> — changer les droits");
-		}
-		else
-		{
-			System.out.println("signup            — créer un compte");
-		System.out.println("login             — se connecter");
-		}
-		
-
 		System.out.println("exit              — quitter");
 	}
+	private void traiterStats()
+	{
+		LogAnalyzerService analyzer = new LogAnalyzerService("src/main/resources/acces.log");
+		boolean statsActif = true;
+		while (statsActif)
+		{
+			System.out.println("=== LogAnalyzer ===");
+			System.out.println("1) Nombre total d'actions");
+			System.out.println("2) Nombre d'accès refusés");
+			System.out.println("3) Utilisateurs distincts");
+			System.out.println("4) Actions par utilisateur");
+			System.out.println("5) Top 3 des fichiers consultés");
+			System.out.println("6) Accès refusés d'un utilisateur");
+			System.out.println("7) Utilisateur le plus actif");
+			System.out.println("8) Répartition des actions par type");
+			System.out.println("0) Quitter");
+			System.out.print("Choix : ");
+			String choix = scanner.nextLine().trim();
+			switch (choix)
+			{
+				case "1":
+					System.out.println("Total actions : " + analyzer.nbrActions());
+					break;
+				case "2":
+					System.out.println("Accès refusés : " + analyzer.nbrRefus());
+					break;
+				case "3":
+					System.out.println("Utilisateurs distincts : " + analyzer.utilisateurDistinct());
+					break;
+				case "4":
+					for (Map.Entry<String, Long> e : analyzer.utilisateurAction().entrySet())
+						System.out.println(e.getKey() + " : " + e.getValue());
+					break;
+				case "5":
+					for (Map.Entry<String, Long> e : analyzer.topFichiers())
+						System.out.println(e.getKey() + " : " + e.getValue());
+					break;
+				case "6":
+					System.out.print("Utilisateur : ");
+					String u = scanner.nextLine().trim();
+					List<AccesLog> refus = analyzer.accesRefus(u);
+					if (refus.isEmpty())
+						System.out.println("Aucun refus.");
+					else
+						for (AccesLog l : refus)
+							System.out.println(l.getDate() + " " + l.getHeure() + " " + l.getAction() + " " + l.getFichier());
+					break;
+				case "7":
+					analyzer.plusActif().ifPresentOrElse(
+						e -> System.out.println("Plus actif : " + e.getKey() + " (" + e.getValue() + " actions)"),
+						() -> System.out.println("Aucun log.")
+					);
+					break;
+				case "8":
+					for (Map.Entry<String, Long> e : analyzer.actionsType().entrySet())
+						System.out.println(e.getKey() + " : " + e.getValue());
+					break;
+				case "0":
+					statsActif = false;
+					break;
+				default:
+					System.out.println("Choix invalide.");
+			}
+		}
+	}
+
 }

@@ -60,7 +60,7 @@ public class UserService
     }
     public String signup (String login , String password)
     {
-        if (login.length() < 3 || login == null || login.trim().isEmpty() || login.contains(" ") || login.contains(":"))
+        if (login == null || login.trim().isEmpty() || login.length() < 3 || login.contains(" ") || login.contains(":"))
         {
             return "Login invalide.";
         }
