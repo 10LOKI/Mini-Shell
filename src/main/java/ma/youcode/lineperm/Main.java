@@ -9,7 +9,8 @@ public class Main
         LogAnalyzerService analyzer = new LogAnalyzerService("src/main/resources/acces.log");
 
         // System.out.println("Total actions: " + analyzer.nbrActions());
-        System.out.println("Total de refus : " + analyzer.nbrRefus());
-        
+        // System.out.println("Total de refus : " + analyzer.nbrRefus());
+        System.out.println("utilisateur distincts : " + analyzer.utilisateurDistinct());
+
     }
 }
