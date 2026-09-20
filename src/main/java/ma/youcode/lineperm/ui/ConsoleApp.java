@@ -179,7 +179,15 @@ private void traiterTouch(String[] mots)
 		}
 		String contenu = fichierservice.lire(mots[1], userservice.getCurrentUser());
 		if (contenu != null)
+		{
 			System.out.println(contenu);
+			enregistrerLog(mots[1], "LECTURE", "OK");
+		}
+		else
+		{
+			enregistrerLog(mots[1], "LECTURE", "REFUSE");
+		}
+			
 	}
 
 	private void traiterWrite(String[] mots)
@@ -190,7 +198,6 @@ private void traiterTouch(String[] mots)
 			System.out.println("Usage: write <nom_fichier> <contenu>");
 			return;
 		}
-		// join everything after the filename as content
 		String contenu = String.join(" ", java.util.Arrays.copyOfRange(mots, 2, mots.length));
 		fichierservice.ecrire(mots[1], contenu, userservice.getCurrentUser());
 		fichierservice.sauvegarder();
