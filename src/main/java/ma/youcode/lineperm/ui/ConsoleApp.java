@@ -199,8 +199,9 @@ private void traiterTouch(String[] mots)
 			return;
 		}
 		String contenu = String.join(" ", java.util.Arrays.copyOfRange(mots, 2, mots.length));
-		fichierservice.ecrire(mots[1], contenu, userservice.getCurrentUser());
+		boolean succes = fichierservice.ecrire(mots[1], contenu, userservice.getCurrentUser());
 		fichierservice.sauvegarder();
+		enregistrerLog(mots[1], "ECRITURE", succes ? "OK" : "REFUSE");
 	}
 
 	private void traiterRm(String[] mots)
