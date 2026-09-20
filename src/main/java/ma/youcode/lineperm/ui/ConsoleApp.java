@@ -15,6 +15,7 @@ public class ConsoleApp
 	private Scanner scanner = new Scanner(System.in);
 	private UserService userservice = new UserService();
 	private FichierService fichierservice = new FichierService();
+	private Static final String LOG_FILE = "src/main/resources/acces.log";
 
 	public ConsoleApp()
 	{
