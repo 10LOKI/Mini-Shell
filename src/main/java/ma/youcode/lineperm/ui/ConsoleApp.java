@@ -1,14 +1,19 @@
 package ma.youcode.lineperm.ui;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import ma.youcode.lineperm.service.UserService;
-import ma.youcode.lineperm.service.FichierService;
-import ma.youcode.lineperm.service.LogAnalyzerService;
-import ma.youcode.lineperm.model.AccesLog;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import ma.youcode.lineperm.model.AccesLog;
+import ma.youcode.lineperm.service.FichierService;
+import ma.youcode.lineperm.service.LogAnalyzerService;
+import ma.youcode.lineperm.service.UserService;
 
 public class ConsoleApp
 {
@@ -17,7 +22,7 @@ public class ConsoleApp
 	private Scanner scanner = new Scanner(System.in);
 	private UserService userservice = new UserService();
 	private FichierService fichierservice = new FichierService();
-	private Static final String LOG_FILE = "src/main/resources/acces.log";
+	private static final String LOG_FILE = "src/main/resources/acces.log";
 
 	public ConsoleApp()
 	{
@@ -109,7 +114,7 @@ public class ConsoleApp
 		try
 		{
 			String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-			String heure = LocalDate.now().format(DateTimeFormatter.ofPattern("HH:mm"));
+			String heure = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"));
 			String ligne = date + ";" + heure + ";" + user_connecte + ";" + action + ";" + fichier + ";" + resultat + "\n";
 			Files.writeString(Path.of(LOG_FILE), ligne, StandardOpenOption.APPEND , StandardOpenOption.CREATE);
 		}
@@ -174,7 +179,15 @@ private void traiterTouch(String[] mots)
 		}
 		String contenu = fichierservice.lire(mots[1], userservice.getCurrentUser());
 		if (contenu != null)
+		{
 			System.out.println(contenu);
+			enregistrerLog(mots[1], "LECTURE", "OK");
+		}
+		else
+		{
+			enregistrerLog(mots[1], "LECTURE", "REFUSE");
+		}
+			
 	}
 
 	private void traiterWrite(String[] mots)
@@ -185,10 +198,10 @@ private void traiterTouch(String[] mots)
 			System.out.println("Usage: write <nom_fichier> <contenu>");
 			return;
 		}
-		// join everything after the filename as content
 		String contenu = String.join(" ", java.util.Arrays.copyOfRange(mots, 2, mots.length));
-		fichierservice.ecrire(mots[1], contenu, userservice.getCurrentUser());
+		boolean succes = fichierservice.ecrire(mots[1], contenu, userservice.getCurrentUser());
 		fichierservice.sauvegarder();
+		enregistrerLog(mots[1], "ECRITURE", succes ? "OK" : "REFUSE");
 	}
 
 	private void traiterRm(String[] mots)
@@ -199,8 +212,9 @@ private void traiterTouch(String[] mots)
 			System.out.println("Usage: rm <nom_fichier>");
 			return;
 		}
-		fichierservice.supprimer(mots[1], userservice.getCurrentUser());
+		boolean succes = fichierservice.supprimer(mots[1], userservice.getCurrentUser());
 		fichierservice.sauvegarder();
+		enregistrerLog(mots[1], "SUPPRESSION", succes ? "OK" : "REFUSE");
 	}
 
 	private void traiterChmod(String[] mots)
@@ -213,8 +227,9 @@ private void traiterTouch(String[] mots)
 		}
 		char droit = mots[3].charAt(0);
 		boolean valeur = Boolean.parseBoolean(mots[4]);
-		fichierservice.changerPerm(mots[1], mots[2], droit, valeur, userservice.getCurrentUser());
+		boolean succes = fichierservice.changerPerm(mots[1], mots[2], droit, valeur, userservice.getCurrentUser());
 		fichierservice.sauvegarder();
+		enregistrerLog(mots[1], "CHMOD", succes ? "OK" : "REFUSE");
 	}
 
 	private void traiterHelp()
