@@ -227,8 +227,9 @@ private void traiterTouch(String[] mots)
 		}
 		char droit = mots[3].charAt(0);
 		boolean valeur = Boolean.parseBoolean(mots[4]);
-		fichierservice.changerPerm(mots[1], mots[2], droit, valeur, userservice.getCurrentUser());
+		boolean succes = fichierservice.changerPerm(mots[1], mots[2], droit, valeur, userservice.getCurrentUser());
 		fichierservice.sauvegarder();
+		enregistrerLog(mots[1], "CHMOD", succes ? "OK" : "REFUSE");
 	}
 
 	private void traiterHelp()
