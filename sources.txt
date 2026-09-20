@@ -1,0 +1,9 @@
+src/main/java/ma/youcode/lineperm/access/ControleAcces.java
+src/main/java/ma/youcode/lineperm/Main.java
+src/main/java/ma/youcode/lineperm/model/AccesLog.java
+src/main/java/ma/youcode/lineperm/model/Fichier.java
+src/main/java/ma/youcode/lineperm/model/User.java
+src/main/java/ma/youcode/lineperm/service/FichierService.java
+src/main/java/ma/youcode/lineperm/service/LogAnalyzerService.java
+src/main/java/ma/youcode/lineperm/service/UserService.java
+src/main/java/ma/youcode/lineperm/ui/ConsoleApp.java

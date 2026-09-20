@@ -1,9 +1,12 @@
 package ma.youcode.lineperm;
 
+import ma.youcode.lineperm.ui.ConsoleApp;
+
 public class Main
 {
     public static void main(String[] args)
     {
+        new ConsoleApp().commencer();
         // LogAnalyzerService analyzer = new LogAnalyzerService("src/main/resources/acces.log");
 
         // System.out.println("Total actions: " + analyzer.nbrActions());
