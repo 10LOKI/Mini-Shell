@@ -1,14 +1,19 @@
 package ma.youcode.lineperm.ui;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import ma.youcode.lineperm.service.UserService;
-import ma.youcode.lineperm.service.FichierService;
-import ma.youcode.lineperm.service.LogAnalyzerService;
-import ma.youcode.lineperm.model.AccesLog;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import ma.youcode.lineperm.model.AccesLog;
+import ma.youcode.lineperm.service.FichierService;
+import ma.youcode.lineperm.service.LogAnalyzerService;
+import ma.youcode.lineperm.service.UserService;
 
 public class ConsoleApp
 {
@@ -17,7 +22,7 @@ public class ConsoleApp
 	private Scanner scanner = new Scanner(System.in);
 	private UserService userservice = new UserService();
 	private FichierService fichierservice = new FichierService();
-	private Static final String LOG_FILE = "src/main/resources/acces.log";
+	private static final String LOG_FILE = "src/main/resources/acces.log";
 
 	public ConsoleApp()
 	{
@@ -109,7 +114,7 @@ public class ConsoleApp
 		try
 		{
 			String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-			String heure = LocalDate.now().format(DateTimeFormatter.ofPattern("HH:mm"));
+			String heure = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"));
 			String ligne = date + ";" + heure + ";" + user_connecte + ";" + action + ";" + fichier + ";" + resultat + "\n";
 			Files.writeString(Path.of(LOG_FILE), ligne, StandardOpenOption.APPEND , StandardOpenOption.CREATE);
 		}
