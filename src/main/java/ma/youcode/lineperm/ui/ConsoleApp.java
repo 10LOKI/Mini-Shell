@@ -212,8 +212,9 @@ private void traiterTouch(String[] mots)
 			System.out.println("Usage: rm <nom_fichier>");
 			return;
 		}
-		fichierservice.supprimer(mots[1], userservice.getCurrentUser());
+		boolean succes = fichierservice.supprimer(mots[1], userservice.getCurrentUser());
 		fichierservice.sauvegarder();
+		enregistrerLog(mots[1], "SUPPRESSION", succes ? "OK" : "REFUSE");
 	}
 
 	private void traiterChmod(String[] mots)
