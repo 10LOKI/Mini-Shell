@@ -1,5 +1,7 @@
 package ma.youcode.lineperm.ui;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import ma.youcode.lineperm.service.UserService;
 import ma.youcode.lineperm.service.FichierService;
 import ma.youcode.lineperm.service.LogAnalyzerService;
@@ -102,6 +104,20 @@ public class ConsoleApp
 		return (true);
 	}
 
+	private void	enregistrerLog(String fichier, String action, String resultat)
+	{
+		try
+		{
+			String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+			String heure = LocalDate.now().format(DateTimeFormatter.ofPattern("HH:mm"));
+			String ligne = date + ";" + heure + ";" + user_connecte + ";" + action + ";" + fichier + ";" + resultat + "\n";
+			Files.writeString(Path.of(LOG_FILE), ligne, StandardOpenOption.APPEND , StandardOpenOption.CREATE);
+		}
+		catch (IOException e)
+		{
+			System.out.println("Erreur lors de l'enregistrement du log : " + e.getMessage());
+		}
+	}
 	private void traiterSignup()
 	{
 		System.out.print("Login : ");
