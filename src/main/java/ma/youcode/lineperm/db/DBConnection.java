@@ -1,5 +1,6 @@
 package ma.youcode.lineperm.db;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 
 public class DBConnection {
@@ -8,16 +9,20 @@ public class DBConnection {
 
     private DBConnection() throws SQLException
     {
-
+        
     }
 
     public static DBConnection getInstance() throws SQLException
     {
-
+        if (instance == null)
+        {
+            instance = new DBConnection();
+        }
+        return  (instance);
     }
 
     public Connection getConnection()
     {
-        
+        return (this.connection);
     }
 }
