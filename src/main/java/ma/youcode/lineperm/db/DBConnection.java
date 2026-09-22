@@ -6,11 +6,14 @@ import java.sql.SQLException;
 
 public class DBConnection {
     private static DBConnection instance;
-    private Connection connection;
+    private final Connection connection;
+    private static final String PROTOCOLE = "jdbc";
+    private static final String DRIVER = "sqlite";
+    private static final String DB = "audit.db";
 
     private DBConnection() throws SQLException
     {
-        String url = "jdbc:sqlite:audit.db";
+        String url = PROTOCOLE + ":" + DRIVER+ ":" + DB;
         this.connection = DriverManager.getConnection(url);
     }
 
