@@ -1,12 +1,14 @@
 package ma.youcode.lineperm;
 
-import ma.youcode.lineperm.ui.ConsoleApp;
+import java.sql.Connection;
+import java.sql.SQLException;
+import ma.youcode.lineperm.db.DBConnection;
 
 public class Main
 {
     public static void main(String[] args)
     {
-        new ConsoleApp().commencer();
+        // new ConsoleApp().commencer();
         // LogAnalyzerService analyzer = new LogAnalyzerService("src/main/resources/acces.log");
 
         // System.out.println("Total actions: " + analyzer.nbrActions());
@@ -17,5 +19,12 @@ public class Main
         // System.out.println("topFichiers : " + analyzer.accesRefus("Ayoub"));
         // System.out.println("topFichiers : " + analyzer.plusActif());
         // System.out.println("topFichiers : " + analyzer.actionsType());
+        try {
+            Connection conn = DBConnection.getInstance().getConnection();
+            if (conn != null)
+                System.out.println("DB connected successfully");
+        } catch (SQLException e) {
+            System.out.println("DB connection failed: " + e.getMessage());
+        }
     }
 }
