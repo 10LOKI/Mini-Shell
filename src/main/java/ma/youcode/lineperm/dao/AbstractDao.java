@@ -1,5 +1,5 @@
 package ma.youcode.lineperm.dao;
 
-public class AbstractDao {
+public abstract class AbstractDao implements Dao<T>{
     
 }

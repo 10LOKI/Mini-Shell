@@ -1,5 +1,7 @@
 package ma.youcode.lineperm.dao;
 
-public class Dao {
-    
+public interface Dao<T> {
+    void    save(T t);
+    T       findById(int id);
+    void    delete(int id);
 }
