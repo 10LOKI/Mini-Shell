@@ -1,9 +1,5 @@
 package ma.youcode.lineperm;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import ma.youcode.lineperm.db.DBConnection;
-
 public class Main
 {
     public static void main(String[] args)
@@ -19,12 +15,12 @@ public class Main
         // System.out.println("topFichiers : " + analyzer.accesRefus("Ayoub"));
         // System.out.println("topFichiers : " + analyzer.plusActif());
         // System.out.println("topFichiers : " + analyzer.actionsType());
-        try {
-            Connection conn = DBConnection.getInstance().getConnection();
-            if (conn != null)
-                System.out.println("DB connected successfully");
-        } catch (SQLException e) {
-            System.out.println("DB connection failed: " + e.getMessage());
-        }
+        // try {
+        //     Connection conn = DBConnection.getInstance().getConnection();
+        //     if (conn != null)
+        //         System.out.println("DB connected successfully");
+        // } catch (SQLException e) {
+        //     System.out.println("DB connection failed: " + e.getMessage());
+        // }
     }
 }
