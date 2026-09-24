@@ -17,8 +17,18 @@ public class UserDao extends AbstractDao<User>
     }
 
     @Override
-    public void     save(User t)
+    public void     save(User user)
     {
-
+        String sqlQuery = "insert into users (login,password)  values (?,?)";
+        try (PreparedStatement stmt = getConnection().prepareStatement(sqlQuery))
+        {
+            stmt.setString(1, user.getLogin());
+            stmt.setString(2, user.getPasswordHash());
+            stmt.executeUpdate();
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Database error : " + e.getMessage());
+        }
     }
 }
