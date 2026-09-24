@@ -1,12 +1,12 @@
 package ma.youcode.lineperm;
-import ma.youcode.lineperm.dao.UserDao;
-import ma.youcode.lineperm.model.User;
+
+import ma.youcode.lineperm.ui.ConsoleApp;
 
 public class Main
 {
     public static void main(String[] args)
     {
-        // new ConsoleApp().commencer();
+        new ConsoleApp().commencer();
         // LogAnalyzerService analyzer = new LogAnalyzerService("src/main/resources/acces.log");
 
 
@@ -30,11 +30,11 @@ public class Main
         // }
 
 
-        UserDao userdao = new UserDao();
-        User user2 = new User("oayoub","$2a$12$eImiTXuWVxfM37test_hash");
+        // UserDao userdao = new UserDao();
+        // User user2 = new User("oayoub","$2a$12$eImiTXuWVxfM37test_hash");
 
-        System.out.println("Saving user in the database :");
-        userdao.save(user2);
-        System.out.println("Execution completed.");
+        // System.out.println("Saving user in the database :");
+        // userdao.save(user2);
+        // System.out.println("Execution completed.");
     }
 }

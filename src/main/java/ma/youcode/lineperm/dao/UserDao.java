@@ -1,13 +1,22 @@
 package ma.youcode.lineperm.dao;
 
-import ma.youcode.lineperm.model.User;
 import java.sql.*;
+import ma.youcode.lineperm.model.User;
 public class UserDao extends AbstractDao<User>
 {
-    public User     findByLogin(String login)
-    {
-        String  sqlQuery = "select * from users where login = ?";
-    }
+    // public User     findByLogin(String login)
+    // {
+    //     // String  sqlQuery = "select * from users where login = ?";
+    //     // try(PreparedStatement stmt = getConnection().prepareStatement(sqlQuery))
+    //     // {
+
+    //     //     return 
+    //     // }
+    //     // catch(SQLException e)
+    //     // {
+    //     //     System.out.println("database occured an error :" + e.getMessage());
+    //     // }
+    // }
     @Override
     public void     delete(int id)
     {
@@ -17,7 +26,7 @@ public class UserDao extends AbstractDao<User>
     @Override
     public User    findById(int id)
     {
-        return (User);
+        return null;
     }
 
     @Override
@@ -29,7 +38,7 @@ public class UserDao extends AbstractDao<User>
             stmt.setString(1, user.getLogin());
             stmt.setString(2, user.getPasswordHash());
             stmt.executeUpdate();
-            System.out.println("Testing my code");
+            // System.out.println("Testing my code");
         }
         catch (SQLException e)
         {

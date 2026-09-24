@@ -7,12 +7,16 @@ import java.util.Map;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import ma.youcode.lineperm.dao.Dao;
 import org.mindrot.jbcrypt.BCrypt;
+import ma.youcode.lineperm.dao.UserDao;
+
 
 public class UserService
 {
     private Map<String,User> users;
     private User currentUser;
+    private final Dao<User> userdao = new UserDao();
     
     private static final String USERS_FILE = "data/users.db";
 
@@ -80,6 +84,9 @@ public class UserService
         User user = new User(login, hash);
         users.put(login, user);
         sauvegarder();
+        
+        userdao.save(user);
+        
         return "Compte cree par succes";
     }
 
