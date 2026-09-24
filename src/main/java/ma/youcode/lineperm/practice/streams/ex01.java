@@ -1,6 +1,6 @@
 package ma.youcode.lineperm.practice.streams;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
 
 public class ex01
 {
@@ -8,7 +8,8 @@ public class ex01
     {
         List<Integer> numbers = List.of(1, 2, 3, 4, 5);
 
-        List<Integer> result = numbers.stream().map(n -> n * 2).collect(Collectors.toList());
-        System.out.println(result);
+        // List<Integer> result = numbers.stream().map(n -> n * 2).collect(Collectors.toList());
+        // System.out.println(result);
+        List<Integer> loop = new ArrayList<>();
     }
 }
