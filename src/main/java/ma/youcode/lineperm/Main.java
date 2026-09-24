@@ -1,4 +1,6 @@
 package ma.youcode.lineperm;
+import ma.youcode.lineperm.dao.UserDao;
+import ma.youcode.lineperm.model.User;
 
 public class Main
 {
@@ -7,6 +9,8 @@ public class Main
         // new ConsoleApp().commencer();
         // LogAnalyzerService analyzer = new LogAnalyzerService("src/main/resources/acces.log");
 
+
+        // ======> Stats Tests
         // System.out.println("Total actions: " + analyzer.nbrActions());
         // System.out.println("Total de refus : " + analyzer.nbrRefus());
         // System.out.println("utilisateur distincts : " + analyzer.utilisateurDistinct());
@@ -15,6 +19,8 @@ public class Main
         // System.out.println("topFichiers : " + analyzer.accesRefus("Ayoub"));
         // System.out.println("topFichiers : " + analyzer.plusActif());
         // System.out.println("topFichiers : " + analyzer.actionsType());
+
+        // ===========> Database Tests
         // try {
         //     Connection conn = DBConnection.getInstance().getConnection();
         //     if (conn != null)
@@ -22,5 +28,13 @@ public class Main
         // } catch (SQLException e) {
         //     System.out.println("DB connection failed: " + e.getMessage());
         // }
+
+
+        UserDao userdao = new UserDao();
+        User user2 = new User("oayoub","$2a$12$eImiTXuWVxfM37test_hash");
+
+        System.out.println("Saving user in the database :");
+        userdao.save(user2);
+        System.out.println("Execution completed.");
     }
 }
