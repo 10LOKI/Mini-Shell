@@ -50,7 +50,7 @@ public class UserDao extends AbstractDao<User>
         }
         catch (SQLException e)
         {
-            System.out.println("Database error : " + e.getMessage());
+            throw new RuntimeException("Database error in save: " + e.getMessage(), e);
         }
     }
 }
