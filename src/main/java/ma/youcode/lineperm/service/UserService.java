@@ -25,7 +25,18 @@ public class UserService
         this.currentUser = null;
         charger(USERS_FILE);
     }
-    public User   getCurrentUser()
+
+    public User     getUserById(int id)
+    {
+        User user = userdao.findById(id);
+        if (user == null)
+        {
+            System.out.println("acun utilisateur avec ce Id ");
+        }
+        return (user);
+    }
+    
+    public User     getCurrentUser()
     {
         return (currentUser);
     }
