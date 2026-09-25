@@ -7,7 +7,6 @@ import java.util.Map;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
-import ma.youcode.lineperm.dao.Dao;
 import org.mindrot.jbcrypt.BCrypt;
 import ma.youcode.lineperm.dao.UserDao;
 
@@ -115,6 +114,7 @@ public class UserService
         {
             return "login ou mot de pass incorrect";
         }
+        userdao.findByLogin(login);
         currentUser = user;
         return "Bienvenue " + user.getLogin();
     }

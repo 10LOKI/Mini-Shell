@@ -1,12 +1,11 @@
 package ma.youcode.lineperm;
 
-import ma.youcode.lineperm.dao.UserDao;
-import ma.youcode.lineperm.model.User;
+import ma.youcode.lineperm.ui.ConsoleApp;
 public class Main
 {
     public static void main(String[] args)
     {
-        // new ConsoleApp().commencer();
+        new ConsoleApp().commencer();
         // LogAnalyzerService analyzer = new LogAnalyzerService("src/main/resources/acces.log");
 
 
@@ -37,16 +36,17 @@ public class Main
         // userdao.save(user2);
         // System.out.println("Execution completed.");
 
-        UserDao userDao = new UserDao();
-        String testLogin = "aouharda";
-        System.out.println("Fetching user with id : " + testLogin);
-        User foundUser = userDao.findByLogin(testLogin);
-        if (foundUser != null)
-        {
-            System.out.println("user found successfully :");
-            System.out.println("Login :" + foundUser.getLogin());
-            System.out.println("Password hash : " + foundUser.getPasswordHash());
-        }
+        // UserDao userDao = new UserDao();
+        // String testLogin = "abdelaziz";
+        // System.out.println("Fetching user with id : " + testLogin);
+        // User foundUser = userDao.findByLogin(testLogin);
+        // if (foundUser != null)
+        // {
+        //     System.out.println("user found successfully :");
+        //     System.out.println("Id : " + foundUser.getId());
+        //     System.out.println("Login :" + foundUser.getLogin());
+        //     System.out.println("Password hash : " + foundUser.getPasswordHash());
+        // }
         
     }
 }

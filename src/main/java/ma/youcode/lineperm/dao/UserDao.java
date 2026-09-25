@@ -15,6 +15,7 @@ public class UserDao extends AbstractDao<User>
                 if (result.next()) 
                 {
                     User user = new User(result.getInt("id") ,result.getString("login"), result.getString("password"));
+                    // System.out.println("he's found");
                     return (user);
                 }
             }
@@ -32,20 +33,13 @@ public class UserDao extends AbstractDao<User>
         String sqlQuery = "delete * from users where id = ?";
     }
 
-    // @Override
-    // public User    findById(int id)
-    // {
-    //     String sqlQuery = "select * from users where id = ?";
-    //     try()
-    //     {
+    @Override
+    public User    findById(int id)
+    {
+        String sqlQuery = "select * from users where id = ?";
 
-    //     }
-    //     catch ()
-    //     {
-
-    //     }
-    //     return null;
-    // }
+        return null;
+    }
 
     @Override
     public void     save(User user)
