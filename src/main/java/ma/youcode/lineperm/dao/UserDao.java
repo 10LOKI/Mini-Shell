@@ -14,9 +14,8 @@ public class UserDao extends AbstractDao<User>
             {
                 if (result.next()) 
                 {
-                    User user = new User(result.getString("login"), result.getString("password"));
-                    user.setId(result.getInt("id"));
-                    return user;
+                    User user = new User(result.getInt("id") ,result.getString("login"), result.getString("password"));
+                    return (user);
                 }
             }
         }
