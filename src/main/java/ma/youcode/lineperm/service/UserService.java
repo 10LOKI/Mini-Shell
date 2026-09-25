@@ -35,7 +35,7 @@ public class UserService
         }
         return (user);
     }
-    
+
     public User     getCurrentUser()
     {
         return (currentUser);
@@ -92,10 +92,14 @@ public class UserService
         }
         String hash = BCrypt.hashpw(password, BCrypt.gensalt());
         User user = new User(login, hash);
-        users.put(login, user);
-        sauvegarder();
-        
-        userdao.save(user);
+        try
+        {
+            userdao.save(user);
+        }
+        catch (IllegalArgumentException e)
+        {
+            return (e.getMessage());
+        }
         
         return "Compte cree par succes";
     }
