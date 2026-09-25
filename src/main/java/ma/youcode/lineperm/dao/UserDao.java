@@ -4,30 +4,49 @@ import java.sql.*;
 import ma.youcode.lineperm.model.User;
 public class UserDao extends AbstractDao<User>
 {
-    // public User     findByLogin(String login)
-    // {
-    //     // String  sqlQuery = "select * from users where login = ?";
-    //     // try(PreparedStatement stmt = getConnection().prepareStatement(sqlQuery))
-    //     // {
-
-    //     //     return 
-    //     // }
-    //     // catch(SQLException e)
-    //     // {
-    //     //     System.out.println("database occured an error :" + e.getMessage());
-    //     // }
-    // }
+    public User findByLogin(String login) 
+    {
+        String sqlQuery = "select * from users where login = ?";
+        try (PreparedStatement stmt = getConnection().prepareStatement(sqlQuery)) 
+        {
+            stmt.setString(1, login);
+            try (ResultSet result = stmt.executeQuery()) 
+            {
+                if (result.next()) 
+                {
+                    User user = new User(result.getString("login"), result.getString("password"));
+                    user.setId(result.getInt("id"));
+                    return user;
+                }
+            }
+        }
+        catch (SQLException e) 
+        {
+            throw new RuntimeException("Database error in findByLogin: " + e.getMessage(), e);
+        }
+        return null;
+    }
+    
     @Override
     public void     delete(int id)
     {
-
+        String sqlQuery = "delete * from users where id = ?";
     }
 
-    @Override
-    public User    findById(int id)
-    {
-        return null;
-    }
+    // @Override
+    // public User    findById(int id)
+    // {
+    //     String sqlQuery = "select * from users where id = ?";
+    //     try()
+    //     {
+
+    //     }
+    //     catch ()
+    //     {
+
+    //     }
+    //     return null;
+    // }
 
     @Override
     public void     save(User user)

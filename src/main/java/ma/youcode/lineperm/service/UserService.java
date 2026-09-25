@@ -16,7 +16,7 @@ public class UserService
 {
     private Map<String,User> users;
     private User currentUser;
-    private final Dao<User> userdao = new UserDao();
+    private final UserDao userdao = new UserDao();
     
     private static final String USERS_FILE = "data/users.db";
 
