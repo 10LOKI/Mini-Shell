@@ -37,7 +37,23 @@ public class UserDao extends AbstractDao<User>
     public User    findById(int id)
     {
         String sqlQuery = "select * from users where id = ?";
-
+        try (PreparedStatement stmt = getConnection().prepareStatement(sqlQuery))
+        {
+            stmt.setInt(1, id);
+            try (ResultSet result = stmt.executeQuery())
+            {
+                if (result.next())
+                {
+                    User user = new User(result.getInt("id") ,result.getString("login"), result.getString("password"));
+                    // System.out.println("he's found");
+                    return (user);
+                }
+            }
+        }
+        catch (SQLException e)
+        {
+            throw new RuntimeException("Database error in findById : " + e.getMessage(), e);
+        }
         return null;
     }
 
