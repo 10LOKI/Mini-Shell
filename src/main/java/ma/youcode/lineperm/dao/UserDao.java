@@ -4,15 +4,6 @@ import java.sql.*;
 import ma.youcode.lineperm.model.User;
 public class UserDao extends AbstractDao<User>
 {
-    @Override
-    public void delete(int id) {
-        throw new UnsupportedOperationException("Delete operation is not supported by UserDao.");
-    }
-
-    @Override
-    public User findById(int id) {
-        throw new UnsupportedOperationException("FindById operation is not supported by UserDao.");
-    }
     public User findByLogin(String login) 
     {
         String sqlQuery = "select * from users where login = ?";
@@ -48,9 +39,53 @@ public class UserDao extends AbstractDao<User>
             stmt.executeUpdate();
             // System.out.println("Testing my code");
         }
+        catch (SQLException e) 
+        {
+            if (e.getMessage().contains("UNIQUE constraint failed")) 
+            {
+                throw new IllegalArgumentException("Ce login existe déjà : " + user.getLogin());
+            }
+            throw new RuntimeException("Database error in save: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public User    findById(int id)
+    {
+        String sqlQuery = "select * from users where id = ?";
+        try (PreparedStatement stmt = getConnection().prepareStatement(sqlQuery))
+        {
+            stmt.setInt(1, id);
+            try (ResultSet result = stmt.executeQuery())
+            {
+                if (result.next())
+                {
+                    User user = new User(result.getInt("id") ,result.getString("login"), result.getString("password"));
+                    // System.out.println("he's found");
+                    return (user);
+                }
+            }
+        }
         catch (SQLException e)
         {
-            throw new RuntimeException("Database error in save: " + e.getMessage(), e);
+            throw new RuntimeException("Database error in findById : " + e.getMessage(), e);
+        }
+        return null;
+    }
+
+
+        
+    @Override
+    public void     delete(int id)
+    {
+        String sqlQuery = "delete from users where id = ?";
+        try (PreparedStatement stmt = getConnection().prepareStatement(sqlQuery)) 
+        {
+            stmt.setInt(1, id);
+            stmt.executeUpdate();
+        } catch (SQLException e) 
+        {
+            throw new RuntimeException("Database error in delete for ID " + id + ": " + e.getMessage(), e);
         }
     }
 }
