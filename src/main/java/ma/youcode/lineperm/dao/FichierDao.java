@@ -4,25 +4,24 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import ma.youcode.lineperm.model.Fichier;
-import ma.youcode.lineperm.model.Droits;
+import ma.youcode.lineperm.model.User;
 
 public class FichierDao extends AbstractDao<Fichier>
 {
     @Override
     public void save(Fichier fichier)
     {
-        String sqlQuery = "insert into fichiers (nom, proprietaire_id, read_prop, write_prop, delete_prop, read_other, write_other, delete_other) values (?, ?, ?, ?, ?, ?, ?, ?)";
+        User proprietaire = new UserDao().findByLogin(fichier.getProprietaire());
+        if (proprietaire == null)
+        {
+            throw new IllegalArgumentException("Proprietaire introuvable : " + fichier.getProprietaire());
+        }
+        String sqlQuery = "insert into files (nom, droits, user_id) values (?, ?, ?)";
         try (PreparedStatement stmt = getConnection().prepareStatement(sqlQuery))
         {
-            Droits d = fichier.getDroits();
             stmt.setString(1, fichier.getNom());
-            stmt.setInt(2, fichier.getProprietaireId());
-            stmt.setBoolean(3, d.isReadProp());
-            stmt.setBoolean(4, d.isWriteProp());
-            stmt.setBoolean(5, d.isDeleteProp());
-            stmt.setBoolean(6, d.isReadOther());
-            stmt.setBoolean(7, d.isWriteOther());
-            stmt.setBoolean(8, d.isDeleteOther());
+            stmt.setString(2, formatDroits(fichier));
+            stmt.setInt(3, proprietaire.getId());
             stmt.executeUpdate();
         }
         catch (SQLException e)
@@ -31,30 +30,41 @@ public class FichierDao extends AbstractDao<Fichier>
         }
     }
 
+    private String formatDroits(Fichier fichier)
+    {
+        return (fichier.isReadProp() ? "r" : "-")
+            + (fichier.isWriteProp() ? "w" : "-")
+            + (fichier.isDeleteProp() ? "d" : "-") + "|"
+            + (fichier.isReadOther() ? "r" : "-")
+            + (fichier.isWriteOther() ? "w" : "-")
+            + (fichier.isDeleteOther() ? "d" : "-");
+    }
+
     private Fichier mapRow(ResultSet result) throws SQLException
     {
-        Droits d = new Droits(
-            result.getBoolean("read_prop"),
-            result.getBoolean("write_prop"),
-            result.getBoolean("delete_prop"),
-            result.getBoolean("read_other"),
-            result.getBoolean("write_other"),
-            result.getBoolean("delete_other")
-        );
-        return new Fichier(result.getInt("id"), result.getString("nom"), result.getInt("proprietaire_id"), d);
+        String droits = result.getString("droits");
+        if (droits == null || !droits.matches("[r-][w-][d-]\\|[r-][w-][d-]"))
+        {
+            throw new SQLException("Droits invalides pour le fichier " + result.getInt("id"));
+        }
+        return new Fichier(result.getInt("id"), result.getString("nom"), result.getString("login"),
+            droits.charAt(0) == 'r', droits.charAt(1) == 'w', droits.charAt(2) == 'd',
+            droits.charAt(4) == 'r', droits.charAt(5) == 'w', droits.charAt(6) == 'd');
     }
 
     @Override
     public Fichier findById(int id)
     {
-        String sqlQuery = "select * from fichiers where id = ?";
+        String sqlQuery = "select f.*, u.login from files f join users u on f.user_id = u.id where f.id = ?";
         try (PreparedStatement stmt = getConnection().prepareStatement(sqlQuery))
         {
             stmt.setInt(1, id);
             try (ResultSet result = stmt.executeQuery())
             {
                 if (result.next())
+                {
                     return mapRow(result);
+                }
             }
         }
         catch (SQLException e)
@@ -66,7 +76,7 @@ public class FichierDao extends AbstractDao<Fichier>
 
     public List<Fichier> findByProprietaire(int userId)
     {
-        String sqlQuery = "select * from fichiers where proprietaire_id = ?";
+        String sqlQuery = "select f.*, u.login from files f join users u on f.user_id = u.id where f.user_id = ?";
         List<Fichier> fichiers = new ArrayList<>();
         try (PreparedStatement stmt = getConnection().prepareStatement(sqlQuery))
         {
@@ -74,7 +84,9 @@ public class FichierDao extends AbstractDao<Fichier>
             try (ResultSet result = stmt.executeQuery())
             {
                 while (result.next())
+                {
                     fichiers.add(mapRow(result));
+                }
             }
         }
         catch (SQLException e)
@@ -84,18 +96,13 @@ public class FichierDao extends AbstractDao<Fichier>
         return fichiers;
     }
 
-    public void updateDroits(int id, Droits droits)
+    public void updateDroits(int id, Fichier fichier)
     {
-        String sqlQuery = "update fichiers set read_prop=?, write_prop=?, delete_prop=?, read_other=?, write_other=?, delete_other=? where id = ?";
+        String sqlQuery = "update files set droits = ? where id = ?";
         try (PreparedStatement stmt = getConnection().prepareStatement(sqlQuery))
         {
-            stmt.setBoolean(1, droits.isReadProp());
-            stmt.setBoolean(2, droits.isWriteProp());
-            stmt.setBoolean(3, droits.isDeleteProp());
-            stmt.setBoolean(4, droits.isReadOther());
-            stmt.setBoolean(5, droits.isWriteOther());
-            stmt.setBoolean(6, droits.isDeleteOther());
-            stmt.setInt(7, id);
+            stmt.setString(1, formatDroits(fichier));
+            stmt.setInt(2, id);
             stmt.executeUpdate();
         }
         catch (SQLException e)
@@ -107,7 +114,7 @@ public class FichierDao extends AbstractDao<Fichier>
     @Override
     public void delete(int id)
     {
-        String sqlQuery = "delete from fichiers where id = ?";
+        String sqlQuery = "delete from files where id = ?";
         try (PreparedStatement stmt = getConnection().prepareStatement(sqlQuery))
         {
             stmt.setInt(1, id);
@@ -115,7 +122,7 @@ public class FichierDao extends AbstractDao<Fichier>
         }
         catch (SQLException e)
         {
-            throw new RuntimeException("Database error in delete: " + e.getMessage(), e);
+            throw new RuntimeException("Database error in delete for ID " + id + ": " + e.getMessage(), e);
         }
     }
 }
