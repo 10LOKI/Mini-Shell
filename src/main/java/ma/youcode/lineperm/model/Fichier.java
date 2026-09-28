@@ -2,6 +2,7 @@ package ma.youcode.lineperm.model;
 
 public class Fichier
 {
+    private final int id;
     private String  nom;
     private String  proprietaire;
     private boolean readProp;
@@ -18,6 +19,12 @@ public class Fichier
 
     public Fichier(String nom, String proprietaire, boolean readProp, boolean writeProp, boolean deleteProp, boolean readOther, boolean writeOther, boolean deleteOther)
     {
+        this(0, nom, proprietaire, readProp, writeProp, deleteProp, readOther, writeOther, deleteOther);
+    }
+
+    public Fichier(int id, String nom, String proprietaire, boolean readProp, boolean writeProp, boolean deleteProp, boolean readOther, boolean writeOther, boolean deleteOther)
+    {
+        this.id = id;
         this.nom = nom;
         this.proprietaire = proprietaire;
         this.readProp = readProp;
@@ -26,6 +33,11 @@ public class Fichier
         this.readOther = readOther;
         this.writeOther = writeOther;
         this.deleteOther = deleteOther;
+    }
+
+    public int getId()
+    {
+        return (id);
     }
 
     public String getNom()

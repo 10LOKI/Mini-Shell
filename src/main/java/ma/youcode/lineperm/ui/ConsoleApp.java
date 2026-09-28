@@ -1,12 +1,5 @@
 package ma.youcode.lineperm.ui;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -14,6 +7,7 @@ import ma.youcode.lineperm.model.AccesLog;
 import ma.youcode.lineperm.service.FichierService;
 import ma.youcode.lineperm.service.LogAnalyzerService;
 import ma.youcode.lineperm.service.UserService;
+import ma.youcode.lineperm.service.LogService;
 
 public class ConsoleApp
 {
@@ -22,14 +16,14 @@ public class ConsoleApp
 	private Scanner scanner = new Scanner(System.in);
 	private UserService userservice = new UserService();
 	private FichierService fichierservice = new FichierService();
-	private static final String LOG_FILE = "src/main/resources/acces.log";
+	private final LogService logService = new LogService();
 
 	public ConsoleApp()
 	{
 		this.is_actif = false;
 		this.user_connecte = null;
 	}
-	
+
 	public void commencer()
 	{
 		System.out.println("╔══════════════════════════════════╗");
@@ -44,14 +38,17 @@ public class ConsoleApp
 			else
 				System.out.print(user_connecte + "@linperm> ");
 
-			String ligne = scanner.nextLine().trim();
+			if (!scanner.hasNextLine()) break;
+            String ligne = scanner.nextLine().trim();
 			if (ligne.isEmpty())
 				continue;
 
-			String[] mots = ligne.split(" ");
+			String[] mots = ligne.split("\\s+");
 			String commande = mots[0];
 
-			switch (commande)
+			try
+            {
+            switch (commande)
 			{
 				case "signup":
 					traiterSignup();
@@ -88,7 +85,6 @@ public class ConsoleApp
 					traiterHelp();
 					break;
 				case "exit":
-					fichierservice.sauvegarder();
 					is_actif = true;
 					System.out.println("Au revoir.");
 					break;
@@ -96,6 +92,11 @@ public class ConsoleApp
 					System.out.println("Commande inconnue.");
 					break;
 			}
+            }
+            catch (RuntimeException e)
+            {
+                System.err.println("Erreur : " + e.getMessage());
+            }
 		}
 	}
 
@@ -109,20 +110,10 @@ public class ConsoleApp
 		return (true);
 	}
 
-	private void	enregistrerLog(String fichier, String action, String resultat)
-	{
-		try
-		{
-			String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-			String heure = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"));
-			String ligne = date + ";" + heure + ";" + user_connecte + ";" + action + ";" + fichier + ";" + resultat + "\n";
-			Files.writeString(Path.of(LOG_FILE), ligne, StandardOpenOption.APPEND , StandardOpenOption.CREATE);
-		}
-		catch (IOException e)
-		{
-			System.out.println("Erreur lors de l'enregistrement du log : " + e.getMessage());
-		}
-	}
+    private void enregistrerLog(String fichier, String action, String resultat)
+    {
+        logService.enregistrer(userservice.getCurrentUser(), fichier, action, resultat);
+    }
 	private void traiterSignup()
 	{
 		System.out.print("Login : ");
@@ -150,7 +141,7 @@ public class ConsoleApp
 		}
 		System.out.println(resultat);
 	}
-	
+
 	private void traiterLogout()
 	{
 		String resultat = userservice.logout();
@@ -165,8 +156,8 @@ private void traiterTouch(String[] mots)
 			System.out.println("Usage: touch <nom_fichier>");
 			return;
 		}
-		fichierservice.creer(mots[1], userservice.getCurrentUser());
-		fichierservice.sauvegarder();
+		boolean succes = fichierservice.creer(mots[1], userservice.getCurrentUser()) != null;
+        enregistrerLog(mots[1], "CREATION", succes ? "OK" : "REFUSE");
 	}
 
 	private void traiterCat(String[] mots)
@@ -187,7 +178,7 @@ private void traiterTouch(String[] mots)
 		{
 			enregistrerLog(mots[1], "LECTURE", "REFUSE");
 		}
-			
+
 	}
 
 	private void traiterWrite(String[] mots)
@@ -200,7 +191,6 @@ private void traiterTouch(String[] mots)
 		}
 		String contenu = String.join(" ", java.util.Arrays.copyOfRange(mots, 2, mots.length));
 		boolean succes = fichierservice.ecrire(mots[1], contenu, userservice.getCurrentUser());
-		fichierservice.sauvegarder();
 		enregistrerLog(mots[1], "ECRITURE", succes ? "OK" : "REFUSE");
 	}
 
@@ -213,14 +203,13 @@ private void traiterTouch(String[] mots)
 			return;
 		}
 		boolean succes = fichierservice.supprimer(mots[1], userservice.getCurrentUser());
-		fichierservice.sauvegarder();
 		enregistrerLog(mots[1], "SUPPRESSION", succes ? "OK" : "REFUSE");
 	}
 
 	private void traiterChmod(String[] mots)
 	{
 		if (!verifierConnexion()) return;
-		if (mots.length != 5)
+		if (mots.length != 5 || !mots[2].matches("prop|other") || !mots[3].matches("[rwd]") || !mots[4].matches("true|false"))
 		{
 			System.out.println("Usage: chmod <fichier> <prop|other> <r|w|d> <true|false>");
 			return;
@@ -228,7 +217,6 @@ private void traiterTouch(String[] mots)
 		char droit = mots[3].charAt(0);
 		boolean valeur = Boolean.parseBoolean(mots[4]);
 		boolean succes = fichierservice.changerPerm(mots[1], mots[2], droit, valeur, userservice.getCurrentUser());
-		fichierservice.sauvegarder();
 		enregistrerLog(mots[1], "CHMOD", succes ? "OK" : "REFUSE");
 	}
 
@@ -247,7 +235,7 @@ private void traiterTouch(String[] mots)
 	}
 	private void traiterStats()
 	{
-		LogAnalyzerService analyzer = new LogAnalyzerService("src/main/resources/acces.log");
+		LogAnalyzerService analyzer = new LogAnalyzerService();
 		boolean statsActif = true;
 		while (statsActif)
 		{
@@ -262,7 +250,8 @@ private void traiterTouch(String[] mots)
 			System.out.println("8) Répartition des actions par type");
 			System.out.println("0) Quitter");
 			System.out.print("Choix : ");
-			String choix = scanner.nextLine().trim();
+			if (!scanner.hasNextLine()) return;
+            String choix = scanner.nextLine().trim();
 			switch (choix)
 			{
 				case "1":
