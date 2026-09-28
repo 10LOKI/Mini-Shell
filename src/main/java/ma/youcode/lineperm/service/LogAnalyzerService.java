@@ -1,6 +1,6 @@
 package ma.youcode.lineperm.service;
 
-import java.io.IOException;
+import ma.youcode.lineperm.dao.LogDao;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -9,57 +9,31 @@ import ma.youcode.lineperm.model.AccesLog;
 
 public class LogAnalyzerService
 {
-    private List<AccesLog> logs;
-
-    public LogAnalyzerService(String cheminFichier)
-    {
-        this.logs = new ArrayList<>();
-        chargerLogs(cheminFichier);
-    }
-
-    private void chargerLogs(String cheminFichier)
-    {
-        try
-        {
-            List<String> lignes = Files.readAllLines(Path.of(cheminFichier));
-            int i = 0;
-            while (i < lignes.size())
-            {
-                String[] champs = lignes.get(i).split(";");
-                if (champs.length == 6)
-                    logs.add(new AccesLog(champs[0], champs[1], champs[2], champs[3], champs[4], champs[5]));
-                i++;
-            }
-        }
-        catch (IOException e)
-        {
-            System.out.println("Impossible de charger le fichier de logs : " + e.getMessage());
-        }
-    }
+    private final LogDao logDao = new LogDao();
 
     public long nbrActions()
     {
-        return logs.stream().count();
+        return logDao.compterTotal();
     }
 
     public long nbrRefus()
     {
-        return logs.stream().filter(l -> l.getResultat().equals("REFUSE")).count();
+        return logDao.compterRefuses();
     }
 
     public List<String> utilisateurDistinct()
     {
-        return logs.stream().map(AccesLog::getUtilisateur).distinct().collect(Collectors.toList());
+        return logDao.findAll().stream().map(AccesLog::getUtilisateur).distinct().collect(Collectors.toList());
     }
 
     public Map<String, Long> utilisateurAction()
     {
-        return logs.stream().collect(Collectors.groupingBy(AccesLog::getUtilisateur, Collectors.counting()));
+        return logDao.findAll().stream().collect(Collectors.groupingBy(AccesLog::getUtilisateur, Collectors.counting()));
     }
 
     public List<Map.Entry<String, Long>> topFichiers()
     {
-        return logs.stream()
+        return logDao.findAll().stream()
             .collect(Collectors.groupingBy(AccesLog::getFichier, Collectors.counting()))
             .entrySet().stream()
             .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
@@ -69,14 +43,14 @@ public class LogAnalyzerService
 
     public List<AccesLog> accesRefus(String utilisateur)
     {
-        return logs.stream()
+        return logDao.findAll().stream()
             .filter(l -> l.getUtilisateur().equals(utilisateur) && l.getResultat().equals("REFUSE"))
             .collect(Collectors.toList());
     }
 
     public Optional<Map.Entry<String, Long>> plusActif()
     {
-        return logs.stream()
+        return logDao.findAll().stream()
             .collect(Collectors.groupingBy(AccesLog::getUtilisateur, Collectors.counting()))
             .entrySet().stream()
             .max(Map.Entry.comparingByValue());
@@ -84,6 +58,6 @@ public class LogAnalyzerService
 
     public Map<String, Long> actionsType()
     {
-        return logs.stream().collect(Collectors.groupingBy(AccesLog::getAction, Collectors.counting()));
+        return logDao.findAll().stream().collect(Collectors.groupingBy(AccesLog::getAction, Collectors.counting()));
     }
 }

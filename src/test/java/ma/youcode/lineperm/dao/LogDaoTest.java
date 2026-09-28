@@ -16,7 +16,7 @@ public class LogDaoTest
             {
                 stmt.execute("create table users (id integer primary key, login text unique, password text)");
                 stmt.execute("create table files (id integer primary key, nom text, droits text, user_id integer references users(id))");
-                stmt.execute("create table logs (id integer primary key, user_id integer not null references users(id), file_id integer not null references files(id), action text not null, resultat text not null, quand text not null)");
+                stmt.execute("create table logs (id integer primary key, user_id integer not null references users(id), file_id integer references files(id) on delete set null, action text not null, resultat text not null, quand text not null, fichier_nom text not null)");
                 stmt.execute("insert into users values (1, 'alice', 'hash'), (2, 'bob', 'hash')");
                 stmt.execute("insert into files values (1, 'a.txt', 'rwd|---', 1), (2, 'b.txt', 'rwd|---', 2)");
             }

@@ -30,6 +30,38 @@ public class FichierDao extends AbstractDao<Fichier>
         }
     }
 
+    public List<Fichier> findAll()
+    {
+        List<Fichier> fichiers = new ArrayList<>();
+        String sqlQuery = "select f.*, u.login from files f join users u on u.id = f.user_id order by f.id";
+        try (PreparedStatement stmt = getConnection().prepareStatement(sqlQuery);
+             ResultSet result = stmt.executeQuery())
+        {
+            while (result.next()) fichiers.add(mapRow(result));
+        }
+        catch (SQLException e)
+        {
+            throw new RuntimeException("Database error in findAll: " + e.getMessage(), e);
+        }
+        return fichiers;
+    }
+
+    public Fichier findByNom(String nom)
+    {
+        String sqlQuery = "select f.*, u.login from files f join users u on u.id = f.user_id where f.nom = ?";
+        try (PreparedStatement stmt = getConnection().prepareStatement(sqlQuery))
+        {
+            stmt.setString(1, nom);
+            try (ResultSet result = stmt.executeQuery())
+            {
+                return result.next() ? mapRow(result) : null;
+            }
+        }
+        catch (SQLException e)
+        {
+            throw new RuntimeException("Database error in findByNom: " + e.getMessage(), e);
+        }
+    }
     private String formatDroits(Fichier fichier)
     {
         return (fichier.isReadProp() ? "r" : "-")

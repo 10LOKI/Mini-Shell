@@ -1,7 +1,10 @@
 package ma.youcode.lineperm.service;
 
 import java.util.List;
-import java.util.ArrayList;
+import ma.youcode.lineperm.dao.FichierDao;
+import ma.youcode.lineperm.db.DBConnection;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.io.IOException;
@@ -11,28 +14,16 @@ import ma.youcode.lineperm.access.ControleAcces;
 
 public class FichierService
 {
-    private List<Fichier> fichiers;
-
-    public FichierService()
-    {
-        this.fichiers = new ArrayList<>();
-        charger();
-    }
+    private final FichierDao fichierDao = new FichierDao();
+    private final Path data = Path.of(System.getProperty("lineperm.data", "data"));
 
     private boolean fichierExiste(String nom)
     {
-        int i = 0;
-        while (i < fichiers.size())
-        {
-            if (fichiers.get(i).getNom().equals(nom))
-                return (true);
-            i++;
-        }
-        return (false);
+        return fichierDao.findByNom(nom) != null;
     }
-
     private boolean nomValide(String nom)
     {
+        if (nom == null || nom.isBlank() || nom.equals(".") || nom.equals("..") || nom.equalsIgnoreCase("users.db") || nom.equalsIgnoreCase("fichiers.db")) return false;
         int i = 0;
         while (i < nom.length())
         {
@@ -48,8 +39,8 @@ public class FichierService
     {
         try
         {
-            Path chemin = Path.of("data").resolve(nom);
-            Files.createDirectories(Path.of("data"));
+            Path chemin = data.resolve(nom);
+            Files.createDirectories(data);
             Files.createFile(chemin);
             return (true);
         }
@@ -63,6 +54,7 @@ public class FichierService
     public void lister()
     {
         int i = 0;
+        List<Fichier> fichiers = fichierDao.findAll();
         while (i < fichiers.size())
         {
             Fichier fichier = fichiers.get(i);
@@ -92,18 +84,29 @@ public class FichierService
             return (null);
         }
         Fichier fichier = new Fichier(nom, currentUser.getLogin());
-        fichiers.add(fichier);
+
         if (!creerFichierSurDisque(nom))
         {
-            fichiers.remove(fichier);
+
             return (null);
         }
-        return (fichier);
+        try
+        {
+            fichierDao.save(fichier);
+        }
+        catch (RuntimeException e)
+        {
+            try { Files.deleteIfExists(data.resolve(nom)); }
+            catch (IOException cleanup) { e.addSuppressed(cleanup); }
+            throw e;
+        }
+        return fichierDao.findByNom(nom);
     }
 
     public String lire(String nom, User currentUser)
     {
         int i = 0;
+        List<Fichier> fichiers = fichierDao.findAll();
         while (i < fichiers.size())
         {
             Fichier fichier = fichiers.get(i);
@@ -116,7 +119,7 @@ public class FichierService
                 }
                 try
                 {
-                    Path chemin = Path.of("data").resolve(nom);
+                    Path chemin = data.resolve(nom);
                     return Files.readString(chemin);
                 }
                 catch (IOException e)
@@ -134,6 +137,7 @@ public class FichierService
     public boolean ecrire(String nom, String contenu, User currentUser)
     {
         int i = 0;
+        List<Fichier> fichiers = fichierDao.findAll();
         while (i < fichiers.size())
         {
             Fichier fichier = fichiers.get(i);
@@ -146,7 +150,7 @@ public class FichierService
                 }
                 try
                 {
-                    Path chemin = Path.of("data").resolve(nom);
+                    Path chemin = data.resolve(nom);
                     Files.writeString(chemin, contenu);
                     return (true);
                 }
@@ -165,6 +169,7 @@ public class FichierService
     public boolean supprimer(String nom, User currentUser)
     {
         int i = 0;
+        List<Fichier> fichiers = fichierDao.findAll();
         while (i < fichiers.size())
         {
             Fichier fichier = fichiers.get(i);
@@ -177,14 +182,30 @@ public class FichierService
                 }
                 try
                 {
-                    Files.deleteIfExists(Path.of("data").resolve(nom));
+                    Connection connection = DBConnection.getInstance().getConnection();
+                    connection.setAutoCommit(false);
+                    try
+                    {
+                        fichierDao.delete(fichier.getId());
+                        Files.deleteIfExists(data.resolve(nom));
+                        connection.commit();
+                    }
+                    catch (IOException | SQLException | RuntimeException e)
+                    {
+                        connection.rollback();
+                        throw e;
+                    }
+                    finally
+                    {
+                        connection.setAutoCommit(true);
+                    }
                 }
-                catch (IOException e)
+                catch (IOException | SQLException e)
                 {
                     System.err.println("Erreur lors de la suppression: " + e.getMessage());
                     return (false);
                 }
-                fichiers.remove(i);
+
                 return (true);
             }
             i++;
@@ -196,6 +217,7 @@ public class FichierService
     public boolean changerPerm(String nom, String cible, char droit, boolean valeur, User currentUser)
     {
         int i = 0;
+        List<Fichier> fichiers = fichierDao.findAll();
         while (i < fichiers.size())
         {
             Fichier fichier = fichiers.get(i);
@@ -229,6 +251,7 @@ public class FichierService
                     System.out.println("droit invalid");
                     return (false);
                 }
+                fichierDao.updateDroits(fichier.getId(), fichier);
                 return (true);
             }
             i++;
@@ -237,67 +260,4 @@ public class FichierService
         return (false);
     }
 
-    public void sauvegarder()
-    {
-        try
-        {
-            Files.createDirectories(Path.of("data"));
-            Path chemin = Path.of("data/fichiers.db");
-            StringBuilder sb = new StringBuilder();
-            int i = 0;
-            while (i < fichiers.size())
-            {
-                Fichier f = fichiers.get(i);
-                sb.append(f.getNom()).append(":")
-                  .append(f.getProprietaire()).append(":")
-                  .append(f.isReadProp()).append(":")
-                  .append(f.isWriteProp()).append(":")
-                  .append(f.isDeleteProp()).append(":")
-                  .append(f.isReadOther()).append(":")
-                  .append(f.isWriteOther()).append(":")
-                  .append(f.isDeleteOther()).append("\n");
-                i++;
-            }
-            Files.writeString(chemin, sb.toString());
-        }
-        catch (IOException e)
-        {
-            System.err.println("Erreur lors de la sauvegarde: " + e.getMessage());
-        }
-    }
-
-    public void charger()
-    {
-        Path chemin = Path.of("data/fichiers.db");
-        if (!Files.exists(chemin))
-            return;
-        try
-        {
-            List<String> lignes = Files.readAllLines(chemin);
-            int i = 0;
-            while (i < lignes.size())
-            {
-                String ligne = lignes.get(i);
-                if (!ligne.trim().isEmpty())
-                {
-                    String[] parts = ligne.split(":");
-                    Fichier f = new Fichier(
-                        parts[0], parts[1],
-                        Boolean.parseBoolean(parts[2]),
-                        Boolean.parseBoolean(parts[3]),
-                        Boolean.parseBoolean(parts[4]),
-                        Boolean.parseBoolean(parts[5]),
-                        Boolean.parseBoolean(parts[6]),
-                        Boolean.parseBoolean(parts[7])
-                    );
-                    fichiers.add(f);
-                }
-                i++;
-            }
-        }
-        catch (IOException e)
-        {
-            System.err.println("Erreur lors du chargement: " + e.getMessage());
-        }
-    }
 }
